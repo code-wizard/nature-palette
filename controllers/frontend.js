@@ -1,6 +1,7 @@
 const rootDir = require("../util/path")
 const path = require("path");
 const Research = require("../models/research");
+
 exports.getHomePage = (req, res, next) => {
     res.render("index", {
         title: "Nature Palette - Add Files",
