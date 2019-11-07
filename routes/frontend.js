@@ -1,13 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const researches = []
-const frontendControllers = require("../controllers/frontend")
+const frontendControllers = require("../controllers/frontend");
+const submissionController = require("../controllers/submission");
+const metaDataController = require("../controllers/metadata");
 
-router.post("/save-file", frontendControllers.uploadResearch);
-router.get("/list-files", frontendControllers.getResearches);
+//router.post("/save-file", frontendControllers.uploadResearch);
+//router.get("/list-files", frontendControllers.getResearches);
 router.get("/", frontendControllers.getHomePage)
+router.post("/save-file", submissionController.uploadSubmission);
+router.get("/list-files", submissionController.getListSubmission);
+//router.get("/metadata-files", metaDataController.getListOfMetaDataFile);
 
-module.exports  = {
-    routes: router,
-    data: researches
+
+module.exports = {
+    routes: router
 };
