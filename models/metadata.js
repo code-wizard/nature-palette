@@ -2,7 +2,8 @@ const getDb = require("../util/database").getDb;
 
 module.exports = class MetaData {
 
-    constructor(submissionId, institutionCode, collectionCode, catalogNumber, genus, specificEpithet, infraspecificEpithet, sex, country, part, replicate) {
+    constructor(fileName,submissionId, institutionCode, collectionCode, catalogNumber, genus, specificEpithet, infraspecificEpithet, sex, country, part, replicate) {
+        this.fileName = fileName;
         this.submissionId = submissionId;
         this.institutionCode = institutionCode;
         this.collectionCode = collectionCode;

@@ -6,6 +6,8 @@ const metaDataController = require("../controllers/metadata");
 module.exports.uploadSubmission = (req, res) => {
 
     const body = req.body;
+    const metaDataFile = req.files["metadataFile"][0];
+    const rawDataZipFile = req.files["rawFile"][0];
 
     submission = new submissionModel();
     submission.firstName = body.firstName;
@@ -18,17 +20,18 @@ module.exports.uploadSubmission = (req, res) => {
     submission.published = body.published;
     submission.reference = body.reference;
     submission.embargo = body.embargo;
-    submission.metaDataFile = req.file;
+    submission.metaDataFile = metaDataFile;
     // submission.statusValid = false; // will change when validation comes
 
+    // save submission to db
     var insertedSubmissionId;
     var savePromise = new Promise((resolve, reject) => {
         resolve(submission.save());
     });
 
-    savePromise.then(function(value){
+    savePromise.then(function (value) {
         insertedSubmissionId = value;
-        
+
         // reading metadata file
         var filePath = submission.metaDataFile.path;
         new Promise((resolve, reject) => {
@@ -40,13 +43,13 @@ module.exports.uploadSubmission = (req, res) => {
                     resolve(results);
                 });
         }).then(function (value) {
-            
+
             // after read, insert meta data file list
             var contentOfMetaDataFile = value;
             contentOfMetaDataFile.forEach(element => {
                 element.submissionId = insertedSubmissionId;
             });
-            metaDataController.uploadMetaData(contentOfMetaDataFile);
+            metaDataController.uploadMetaData(contentOfMetaDataFile, submission, rawDataZipFile.path);
         })
     });
 

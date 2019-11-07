@@ -1,6 +1,7 @@
 const getDb = require("../util/database").getDb;
 
 module.exports = class RawFile {
+    
     constructor(fileName, type, path, uploadDate) {
         this.fileName = fileName;
         this.type = type;
@@ -11,9 +12,9 @@ module.exports = class RawFile {
     save(){
         const db = getDb();
         this.uploadDate = new Date(Date.now()).toISOString();
-        db.collection('rawfile').insertOne(this)
+        return db.collection('rawfile').insertOne(this)
             .then(result => {
-                return result.insertedId;
+                true;
             })
             .catch(e => {
                 console.log(e);
