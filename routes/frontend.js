@@ -36,9 +36,18 @@ router.post("/save-file",
     upload.fields([{name: "rawFile", maxCount: 1},
                  {name: "metadataFile", maxCount:1}]),  frontendControllers.uploadResearch);
 router.get("/list-files", frontendControllers.getResearches);
-router.get("/", frontendControllers.getHomePage)
+// const frontendControllers = require("../controllers/frontend");
+const submissionController = require("../controllers/submission");
+const metaDataController = require("../controllers/metadata");
 
-module.exports  = {
-    routes: router,
-    data: researches
+//router.post("/save-file", frontendControllers.uploadResearch);
+//router.get("/list-files", frontendControllers.getResearches);
+router.get("/", frontendControllers.getHomePage)
+router.post("/save-file", submissionController.uploadSubmission);
+router.get("/list-files", submissionController.getListSubmission);
+//router.get("/metadata-files", metaDataController.getListOfMetaDataFile);
+
+
+module.exports = {
+    routes: router
 };
