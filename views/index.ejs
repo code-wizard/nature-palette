@@ -142,13 +142,13 @@
                 Learn more <span class="icon fa fa-arrow-circle-down"></span></a></p>
             </div>
           </section>
-
-    <form action="/save-file" method="POST" style="width:450px; margin: auto" enctype="multipart/form-data">
-        <% if (hasError) { %>
+          <% if (hasError) { %>
             <div class="alert alert-danger" role="alert">
                     <%= errorMessage %>
                   </div>
         <% } %>
+    <form action="/save-file" method="POST" style="width:450px; margin: auto" enctype="multipart/form-data">
+       
 	    <div class="row">
 			<div class="col">
     			<div class="form-group">
@@ -167,16 +167,50 @@
 	<div class="form-group">
   		<label for="desc">Description:</label>
   		<textarea class="form-control" rows="3" id="desc" name="description"></textarea>
-	</div>
-	<div class="custom-file">
-    <input type="file"  name="file" class="custom-file-input" id="customFile">
-    <label class="custom-file-label" for="customFile">Choose file</label>
+    </div>
+    <div class="form-group">
+        <label>Submission Type</label>
+        <select class="form-control" name="type">
+            <option value="1">Museum</option>
+            <option value="2">Field</option>
+        </select>
+    </div>
+    <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="embargo" name="embargo">
+            <label class="form-check-label" for="embargo">Embargo</label>
+    </div>
+    
+    <div class="form-group" id="embargoDateField" style="display: none">
+        <input type="date" name="embargoDate" id="embargoDate" class="form-control"/>
+    </div>
+
+	<div class="form-group">
+        <div class="custom-file">
+            <input type="file"  name="metadataFile" class="custom-file-input" id="metadataFile">
+            <label class="custom-file-label" for="rawFile">Metadata file</label>
+          </div>
+    </div>
+  <div class="custom-file">
+    <input type="file"  name="rawFile" class="custom-file-input" id="rawFile">
+    <label class="custom-file-label" for="rawFile">Raw file</label>
   </div>
   	<button style="margin-top: 13px;" type="submit" class= "btn btn-outline-primary m-t-4">Add File</button>
     </form>
         
     </main>
 </body>
-
+<script>
+    $(document).ready(()=>{
+        $("#embargo").on("change", function(){
+            if($(this).is(":checked")){
+                console.log("tete")
+                $("#embargoDateField").show();
+            } else {
+                console.log("oweowro")
+                $("#embargoDateField").hide();
+            }
+        })
+    })
+</script>
 </html>
 
