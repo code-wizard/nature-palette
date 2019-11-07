@@ -20,24 +20,35 @@ module.exports.uploadSubmission = (req, res) => {
     submission.embargo = body.embargo;
     submission.metaDataFile = req.file;
     // submission.statusValid = false; // will change when validation comes
-    submission.save();
 
-    var filePath = submission.metaDataFile.path;
-
-    var promiseReadCsv = new Promise((resolve, reject) => {
-        var results = [];
-        fs.createReadStream(filePath)
-            .pipe(csv())
-            .on('data', (data) => results.push(data))
-            .on('end', () => {
-                resolve(results);
-            });
+    var insertedSubmissionId;
+    var savePromise = new Promise((resolve, reject) => {
+        resolve(submission.save());
     });
 
-    promiseReadCsv.then(function (value) {
-        var contentOfMetaDataFile = value;
-        metaDataController.uploadMetaData(contentOfMetaDataFile);
-    })
+    savePromise.then(function(value){
+        insertedSubmissionId = value;
+        
+        // reading metadata file
+        var filePath = submission.metaDataFile.path;
+        new Promise((resolve, reject) => {
+            var results = [];
+            fs.createReadStream(filePath)
+                .pipe(csv())
+                .on('data', (data) => results.push(data))
+                .on('end', () => {
+                    resolve(results);
+                });
+        }).then(function (value) {
+            
+            // after read, insert meta data file list
+            var contentOfMetaDataFile = value;
+            contentOfMetaDataFile.forEach(element => {
+                element.submissionId = insertedSubmissionId;
+            });
+            metaDataController.uploadMetaData(contentOfMetaDataFile);
+        })
+    });
 
     // kaydet
     res.redirect("/list-files");

@@ -25,11 +25,11 @@ module.exports = class Submission {
         this.recordDate = new Date(Date.now());
         return db.collection('submission').insertOne(this)
             .then(result => {
-                true;
+                return result.insertedId;
             })
             .catch(e => {
                 console.log(e);
-                false;
+                0;
             });
     }
 
