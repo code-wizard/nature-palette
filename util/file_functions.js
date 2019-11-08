@@ -2,7 +2,7 @@ const csv = require("csv-parser")
 const fs = require("fs")
 const _ = require("lodash")
 const StreamZip = require("node-stream-zip")
-const RawFile = require("../models/rawFile");
+const RawFile = require("../models/rawfile");
 const MetaData = require("../models/metadata")
 // const processRawFiles = require("../util/agenda")
 
