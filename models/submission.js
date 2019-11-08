@@ -2,7 +2,21 @@ const getDb = require("../util/database").getDb;
 
 module.exports = class Submission {
 
-    constructor(firstName, lastName, description, email, institutionAffiliation, typeOfData, dataFrom, published, reference, doi, embargo, releaseDate, metaDataFileName, recordDate, statusValid) {
+    constructor(firstName,
+        lastName,
+        description,
+        email,
+        institutionAffiliation,
+        typeOfData,
+        dataFrom,
+        published,
+        reference,
+        doi,
+        embargo,
+        releaseDate,
+        metaDataFileName,
+        recordDate,
+        statusValid) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.description = description;
@@ -36,7 +50,7 @@ module.exports = class Submission {
     static getAll() {
         const db = getDb();
         return db.collection('submission')
-            .find(/*{statusValid : true}*/) // will change when validation comes
+            .find( /*{statusValid : true}*/ ) // will change when validation comes
             .toArray()
             .then(result => {
                 return result;

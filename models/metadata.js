@@ -2,8 +2,42 @@ const getDb = require("../util/database").getDb;
 
 module.exports = class MetaData {
 
-    constructor(submissionId, institutionCode, collectionCode, catalogNumber, genus, specificEpithet, infraspecificEpithet, sex, country, part, replicate) {
+    constructor(fileName,
+        submissionId,
+        uniqueId,
+        className,
+        order,
+        family,
+        institutionCode,
+        collectionCode,
+        catalogNumber,
+        genus,
+        specificEpithet,
+        infraspecificEpithet,
+        sex,
+        lifeStage,
+        country,
+        locality,
+        decimalLatitude,
+        decimalLongitude,
+        geodeticDatum,
+        verbatimElevation,
+        eventDate,
+        measurementDeterminedDate,
+        patch,
+        lightAngle1,
+        lightAngle2,
+        probeAngle1,
+        probeAngle2,
+        replicate,
+        comments) {
+
+        this.fileName = fileName;
         this.submissionId = submissionId;
+        this.uniqueId = uniqueId;
+        this.className = className;
+        this.order = order;
+        this.family = family;
         this.institutionCode = institutionCode;
         this.collectionCode = collectionCode;
         this.catalogNumber = catalogNumber;
@@ -11,9 +45,22 @@ module.exports = class MetaData {
         this.specificEpithet = specificEpithet;
         this.infraspecificEpithet = infraspecificEpithet;
         this.sex = sex;
+        this.lifeStage = lifeStage;
         this.country = country;
-        this.part = part;
+        this.locality = locality;
+        this.decimalLatitude = decimalLatitude;
+        this.decimalLongitude = decimalLongitude;
+        this.geodeticDatum = geodeticDatum;
+        this.verbatimElevation = verbatimElevation;
+        this.eventDate = eventDate;
+        this.measurementDeterminedDate = measurementDeterminedDate;
+        this.patch = patch;
+        this.lightAngle1 = lightAngle1;
+        this.lightAngle2 = lightAngle2;
+        this.probeAngle1 = probeAngle1;
+        this.probeAngle2 = probeAngle2;
         this.replicate = replicate;
+        this.comments = comments;
     }
     static saveMany(list){
         const db = getDb()
@@ -35,7 +82,9 @@ module.exports = class MetaData {
     static getListOfMetaDataFileBySubmissionId(submissionId) {
         const db = getDb();
         return db.collection('metadata')
-            .find({ submissionId: submissionId })
+            .find({
+                submissionId: submissionId
+            })
             .toArray()
             .then(result => {
                 return result;

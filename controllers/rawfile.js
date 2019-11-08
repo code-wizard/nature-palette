@@ -1,18 +1,27 @@
-const rawFileModel = require("../models/rawFile");
+const rawFileModel = require("../models/rawfile");
+const StreamZip = require('node-stream-zip');
 
-exports.uploadRawFile = function(data){
 
-    rawFile = new rawFileModel();
-    rawFile.firstName = data.firstName;
-    rawFile.lastName = data.lastName;
-    rawFile.description = data.description;
-    rawFile.email = data.email;
-    rawFile.institutionAffiliation = data.institutionAffiliation;
-    rawFile.typeOfData = data.typeOfData;
-    rawFile.dataFrom = data.dataFrom;
-    rawFile.published = data.published;
-    rawFile.reference = data.reference;
-    rawFile.embargo = data.embargo;
-    rawFile.metaDataFile = req.file;
-    rawFile.save();   
+exports.uploadRawFile = function (zipFilePath, submissionInfo, metaDataInfo) {
+
+    const zip = new StreamZip({
+        file: zipFilePath,
+        storeEntries: true
+    });
+
+    zip.on('ready', () => {
+        for (const entry of Object.values(zip.entries())) {
+            if (!entry.isDirectory) {
+                rawFile = new rawFileModel();
+                rawFile.fileName = entry.name;
+                rawFile.type = submissionInfo.typeOfData;
+                rawFile.path = zipFilePath;
+                new Promise((resolve, reject) => {
+                    resolve(rawFile.save());
+                });
+            }
+        }
+        zip.close()
+    });
+
 }

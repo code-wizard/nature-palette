@@ -25,8 +25,8 @@ exports.uploadResearch = (req, res, next) => {
     const metadataFile = req.files["metadataFile"][0];
     const rawFile = req.files["rawFile"][0];
 
-    
-    
+
+
     // if (!metadataFile || !rawFile) {
 
     //     return res.status(422).render("index", {
@@ -42,19 +42,23 @@ exports.uploadResearch = (req, res, next) => {
     //         errorMessage: "Please specify embargo expiry date"
     //     });
     // }
-    
-    
+
+
     // const stream = fileFuncs.readRows("data-files/" + metadataFile.filename )
     const stream = fileFuncs.readRows("data-files/", {
-        mapHeaders: ({ header, index }) => _.replace(header.toLowerCase(), " ", "")
-      } )
-    requireField = ['fileName', 'institutionCode', 'catalogNumber', 'genus', 'specificEpithet', 'Patch', 'LightAngle1', 'LightAngle2', 
-    'ProbeAngle1', 'ProbeAngle2', 'Replicate'];
+        mapHeaders: ({
+            header,
+            index
+        }) => _.replace(header.toLowerCase(), " ", "")
+    })
+    requireField = ['fileName', 'institutionCode', 'catalogNumber', 'genus', 'specificEpithet', 'Patch', 'LightAngle1', 'LightAngle2',
+        'ProbeAngle1', 'ProbeAngle2', 'Replicate'
+    ];
     const rm = []
     const hm = []
     data = []
     // Make metadata lower case
-    for (f of requireField){
+    for (f of requireField) {
         rm.push(f.toLocaleLowerCase())
     }
     let index = 0;
@@ -112,18 +116,18 @@ exports.uploadResearch = (req, res, next) => {
 }
 
 exports.getResearches = (req, res, next) => {
-    
+
     Research.getDarwin("museum")
-    .then(result => {
-        // console.log(result.length)
-        // for (let d of result){
-        //     console.log(d)
-        // }
-        //console.log(result, "success")
-    })
-    .catch(err => {
-        console.log(err, "error")
-    })
+        .then(result => {
+            // console.log(result.length)
+            // for (let d of result){
+            //     console.log(d)
+            // }
+            //console.log(result, "success")
+        })
+        .catch(err => {
+            console.log(err, "error")
+        })
     Research.fetchAll()
         .then(researches => {
             // console.log(researches, 'Here now')

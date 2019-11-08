@@ -18,7 +18,7 @@ module.exports = class RawFile {
         
         db.collection('rawfile').insertOne(this)
             .then(result => {
-                return result.insertedId;
+                true;
             })
             .catch(e => {
                 console.log(e);
