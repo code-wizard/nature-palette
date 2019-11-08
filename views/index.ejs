@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 
 <!DOCTYPE html>
@@ -12,33 +11,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 <style>
  .main-header {
-=======
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <title><%= title %></title>
-    <style>
-        body {
-            padding: 0;
-            margin: 0;
-            font-family: sans-serif;
-        }
-
-        main {
-            padding: 1rem;
-        }
-
-        .main-header {
->>>>>>> 2adc0e95057513b9148d5cb49d0619eb66be5c75
             width: 100%;
             height: 3.5rem;
             background-color: #ffffff;
@@ -76,35 +48,10 @@
         </div>
     </div>
 
-<<<<<<< HEAD
     <div class="container text-muted">
-=======
-        .form-control input {
-            border: 1px solid #dbc441;
-            font: inherit;
-            border-radius: 2px;
-        }
-
-        button {
-            background-color: DodgerBlue;
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 15px;
-        }
-
-        /* Darker background on mouse-over */
-        button:hover {
-            background-color: RoyalBlue;
-        }
-    </style>
-</head>
->>>>>>> 2adc0e95057513b9148d5cb49d0619eb66be5c75
 
         <!-- cards -->
 
-<<<<<<< HEAD
         <div class="row">
             <div class="col-sm-4">
                 <div class="card">
@@ -169,120 +116,3 @@
    </header>  
 </body>
 </html>
-=======
-
-    <header class="main-header">
-
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a href="/" class="navbar-brand">Natural Palette</a>
-            <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/list-files">Researches</a>
-                    </li>
-
-                </ul>
-            </div>
-            <!-- <div class="collapse navbar-collapse" id="#navbarMenu">
-			<ul class="navbar-nav">
-				<li class="nav-item">
-					<a href="/" class="navbar-link">Upload Files</a>
-				</li>
-			
-				<li class="nav-item">
-					<a class="active" href="/admin/list" class="navbar-link">Add Data</a>
-				</li>
-			</ul>
-		</div> -->
-        </nav>
-
-    </header>
-
-    <main>
-        <section id="welcome" class="jumbotron">
-            <div class="container">
-                <h1><strong>Natural</strong> Palette</h1>
-                <p>A Repository designated to researchers who find pleasure in discovering, capturing, and publishing
-                    biodiversity data.<a href="#learnmore" class="btn btn-lg btn-primary pull-right">
-                        Learn more <span class="icon fa fa-arrow-circle-down"></span></a></p>
-            </div>
-        </section>
-        <% if (hasError) { %>
-        <div class="alert alert-danger" role="alert">
-            <%= errorMessage %>
-        </div>
-        <% } %>
-        <form action="/save-file" method="POST" style="width:450px; margin: auto" enctype="multipart/form-data">
-
-            <div class="row">
-                <div class="col">
-                    <div class="form-group">
-                        <label for="firstname">First Name:</label>
-                        <input type="text" class="form-control" id="firstname" name="firstName">
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="form-group">
-                        <label for="lastname">Last Name:</label>
-                        <input type="text" class="form-control" id="lastname" name="lastName">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="desc">Description:</label>
-                <textarea class="form-control" rows="3" id="desc" name="description"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Submission Type</label>
-                <select class="form-control" name="type">
-                    <option value="1">Museum</option>
-                    <option value="2">Field</option>
-                </select>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="embargo" name="embargo">
-                <label class="form-check-label" for="embargo">Embargo</label>
-            </div>
-
-            <div class="form-group" id="embargoDateField" style="display: none">
-                <input type="date" name="embargoDate" id="embargoDate" class="form-control" />
-            </div>
-
-            <div class="form-group">
-                <div class="custom-file">
-                    <input type="file" name="metadataFile" class="custom-file-input" id="metadataFile">
-                    <label class="custom-file-label" for="rawFile">Metadata file</label>
-                </div>
-            </div>
-            <div class="custom-file">
-                <input type="file" name="rawFile" class="custom-file-input" id="rawFile">
-                <label class="custom-file-label" for="rawFile">Raw file</label>
-            </div>
-            <button style="margin-top: 13px;" type="submit" class="btn btn-outline-primary m-t-4">Add File</button>
-        </form>
-
-    </main>
-</body>
-<script>
-    $(document).ready(() => {
-        $("#embargo").on("change", function () {
-            if ($(this).is(":checked")) {
-                console.log("tete")
-                $("#embargoDateField").show();
-            } else {
-                console.log("oweowro")
-                $("#embargoDateField").hide();
-            }
-        })
-    })
-</script>
-
-</html>
->>>>>>> 2adc0e95057513b9148d5cb49d0619eb66be5c75
