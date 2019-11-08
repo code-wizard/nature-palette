@@ -3,7 +3,4 @@
 # node_modules
 data-files
 util/database.js
-<<<<<<< HEAD
 .DS_Store
-=======
->>>>>>> 2adc0e95057513b9148d5cb49d0619eb66be5c75
