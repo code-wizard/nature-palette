@@ -15,7 +15,11 @@ module.exports = class MetaData {
         this.part = part;
         this.replicate = replicate;
     }
-
+    static saveMany(list){
+        const db = getDb()
+        return db.collection("metadata").insertMany(list)
+        
+    }
     save() {
         const db = getDb();
         return db.collection('metadata').insertOne(this)

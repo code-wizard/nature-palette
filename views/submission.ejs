@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/bootstrap.min.css" >
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous"> -->
+   <!-- Bootstrap Date-Picker Plugin -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/> -->
+<link rel="stylesheet" href="css/smart_wizard.css"></link>
+<link rel="stylesheet" href="css/parsley.css"></link>
+<link rel="stylesheet" href="css/style.css"></link>
+
+<style>
+ .main-header {
+            width: 100%;
+            height: 3.5rem;
+            background-color: #ffffff;
+            padding: 0 1.5rem;
+        }
+ .jumbotron {
+    padding: 0.5em 0.6em;
+        }
+</style>  
+</head>
+  <body>
+   <header class="main-header">
+    <!-- navbar -->
+    <nav class="navbar navbar-toggleable-md bg-info navbar-inverse">
+        <div class="container">
+            <button class="navbar-toggler" data-toggle="collapse" data-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <div class="navbar-nav">
+                        <a class="nav-item nav-link " href="/">Home</a>
+                        <a class="nav-item nav-link" href="/search">Search</a>
+                        <a class="nav-item nav-link active" href="submission">Upload</a>
+                        <a class="nav-item nav-link" href="join">Join</a>
+                        <a class="nav-item nav-link" href="about-us">About Us</a>
+                        <a class="nav-item nav-link" href="help">Help</a>
+                    
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="jumbotron jumbotron-fluid bg-info text-white text-center">
+        <div class="container">
+            <h1 class="display-1">Nature's Palette</h1>
+        </div>
+    </div>
+   </header>
+
+    <div class="container">
+          
+            <div class="row" style="margin-top: 150px;">
+                    <div class="col-sm-12">
+                        <form action="submission" method="POST" 
+                        enctype="multipart/form-data"
+                        class="form-control-with-bg" name="form-wizard" data-parsley-validate="">
+                          <!-- begin wizard -->
+                          <div id="wizard" class="sw-main sw-theme-default">
+                            <!-- begin wizard-step -->
+                            <ul class="nav nav-tabs step-anchor">
+                              <li class="col-md-4 col-sm-4 col-6 active">
+                                <a href="#step-1">
+                                  <span class="number">1</span> 
+                                  <span class="info text-ellipsis">
+                                    Agreement and Template
+                                    <small class="text-ellipsis">Accept the agreement</small>
+                                  </span>
+                                </a>
+                              </li>
+                              <li class="col-md-4 col-sm-4 col-6 done">
+                                <a href="#step-2">
+                                  <span class="number">2</span> 
+                                  <span class="info text-ellipsis">
+                                    Research Details
+                                    <small class="text-ellipsis">Tell us more about your research</small>
+                                  </span>
+                                </a>
+                              </li>
+                              <li class="col-md-4 col-sm-4 col-6">
+                                <a href="#step-3">
+                                  <span class="number">3</span>
+                                  <span class="info text-ellipsis">
+                                    Upload Files
+                                    <small class="text-ellipsis">Upload metadata and raw files</small>
+                                  </span>
+                                </a>
+                              </li>
+                              <!-- <li class="col-md-3 col-sm-4 col-6">
+                                <a href="#step-4">
+                                  <span class="number">4</span> 
+                                  <span class="info text-ellipsis">
+                                    Completed
+                                    <small class="text-ellipsis">Complete Submission</small>
+                                  </span>
+                                </a>
+                              </li> -->
+                            </ul>
+                            <!-- end wizard-step -->
+                            <!-- begin wizard-content -->
+                            <div class="sw-container tab-content" style="min-height: 366px;">
+                                    <% if (hasError) { %>
+                                        <div class="alert alert-danger" role="alert">
+                                                <%= errorMessage %>
+                                              </div>
+                                    <% } %>
+                                    <% if (success) { %>
+                                        <div class="alert alert-success" role="alert">
+                                                <%- successMessage %>
+                                              </div>
+                                    <% } %>
+                              <!-- begin step-1 -->
+                              <div id="step-1" class="step-content" style="display: block;">
+                                <!-- begin fieldset -->
+                                <fieldset>
+                                    <!-- begin row -->
+                                    <div class="row">
+                                      <!-- begin col-8 -->
+                                      <div class="col-md-8 offset-md-2">
+                                        <legend class="no-border f-w-700 p-b-0 m-t-0 m-b-20 f-s-16 text-inverse">Submission Instructions</legend>
+                                        <!-- begin form-group row -->
+                                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                                        <div class="form-check">
+                                            <input type="checkbox"
+                                            data-parsley-mincheck="1"
+                                              name="agree" id="agree" data-parsley-required="true"/>
+                                            <label class="form-check-label" for="agree">I agree <span class="text-danger">*</span></label>
+                                          </div>
+                                        <!-- <a href="submission.html" class="btn btn-primary">Start</a> -->
+                                        
+                                        <div class="row">
+                                        <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-block">
+                                            <p class="card-text">Templates for <b>Reflectance</b> Metadata</p>
+                                            <p class="text-center"><a href="template/Field-based_reflectance_metadata.csv">Field</a> | 
+                                            <a href="template/Museum_reflectance_metadata.csv">Museum</a></p>
+                                            </div>
+                                        </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-block">
+                                                <p class="card-text">Templates for <b>Transmittance</b> Metadata</p>
+                                                <p class="text-center"><a href="#">Field</a> | 
+                                            <a href="#">Museum</a></p>
+                                            </div>
+                                        </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                                <div class="card">
+                                                <div class="card-block">
+                                                        <p class="card-text">Templates for <b>Irradiance</b> Metadata</p>
+                                                        <p class="text-center"><a href="#">Field</a></p>
+                                                </div>
+                                                </div>
+                                            </div>
+                                    </div>
+                                        </div>
+                                      <!-- end col-8 -->
+                                    </div>
+                                    <!-- end row -->
+                                  </fieldset>
+                                <!-- end fieldset -->
+                              </div>
+                              <!-- end step-1 -->
+                              <!-- begin step-2 -->
+                              <div id="step-2" class="step-content" style="display: none;">
+                                <!-- begin fieldset -->
+                                <fieldset>
+                                    <!-- begin row -->
+                                    <div class="row">
+                                      <!-- begin col-8 -->
+                                      <div class="col-md-10 offset-md-1">
+                                        <legend class="no-border f-w-700 p-b-0 m-t-0 m-b-20 f-s-16 text-inverse">Research Details</legend>
+                                        <!-- begin form-group row -->
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                    <div class="form-group row m-b-10">
+                                                            <label class="col-md-3 text-md-left col-form-label">First Name <span class="text-danger">*</span></label>
+                                                            <div class="col-md-8">
+                                                              <input type="text"  data-parsley-group="step-2"
+                                                              data-parsley-required="true"
+                                                              name="firstName" placeholder="John" class="form-control">
+                                                            </div>
+                                                          </div>
+                                                          <!-- end form-group row -->
+                                                          <!-- begin form-group row -->
+                                                          <div class="form-group row m-b-10">
+                                                            <label class="col-md-3 text-md-left col-form-label">Last Name <span class="text-danger">*</span></label>
+                                                            <div class="col-md-8">
+                                                              <input type="text" data-parsley-group="step-2"
+                                                              data-parsley-required="true" name="lastName" placeholder="Smith" class="form-control">
+                                                            </div>
+                                                          </div>
+                                                          <!-- end form-group row -->
+                                                          <div class="form-group row m-b-10">
+                                                              <label class="col-md-3 text-md-left col-form-label">Email</label>
+                                                              <div class="col-md-8">
+                                                                  <input type="text" name="email" placeholder="you@example.com" class="form-control">
+                                                                </div>
+                                                          </div>
+                                                          <div class="form-group row m-b-10">
+                                                              <label class="col-md-3 text-md-left col-form-label">Institution Affiliation <span class="text-danger">*</span></label>
+                                                              <div class="col-md-8">
+                                                                  <input type="text" data-parsley-group="step-2"
+                                                                  data-parsley-required="true" name="institutionAffiliation" placeholder="" class="form-control">
+                                                                </div>
+                                                          </div>
+                                                          <div class="form-group row m-b-10">
+                                                              <label class="col-md-3 text-md-left col-form-label">Type of Data <span class="text-danger">*</span></label>
+                                                              <div class="col-md-8">
+                                                                  <select id="inputState" class="form-control" name="typeOfData" data-parsley-group="step-2"
+                                                                  data-parsley-required="true">
+                                                                      <option value="">Choose from list</option>
+                                                                      <option>Transmittance</option>
+                                                                      <option>Reflectance</option>
+                                                                      <option>Irradiance</option>
+                                                                    </select>
+                                                                </div>
+                                                          </div>
+                                                          
+                                            </div>
+                                            <div class="col-lg-6">
+                                                    <div class="form-group row m-b-10">
+                                                            <label class="col-md-3 text-md-left col-form-label">Data from <span class="text-danger">*</span></label>
+                                                            <div class="col-md-8">
+                                                                <select id="inputState" class="form-control"  data-parsley-group="step-2"
+                                                                data-parsley-required="true" name="dataFrom">
+                                                                    <option selected value="">Choose from list</option>
+                                                                    <option value="field">Field</option>
+                                                                    <option value="museum">Museum</option>
+                                                                    
+                                                                  </select>
+                                                              </div>
+                                                        </div>
+                                                        <div class="form-group row m-b-10">
+                                                            <label class="col-md-3 text-md-left col-form-label">DOI</label>
+                                                            <div class="col-md-8">
+                                                                <input type="text" name="doi" placeholder="Digital object identifier" class="form-control">
+                                                              </div>
+                                                        </div>
+                                                        <div class="form-group row m-b-10">
+                                                                <label class="col-md-3 text-md-left col-form-label">Reference<span class="text-danger">*</span></label>
+                                                                <div class="col-md-8">
+                                                                    <input type="text" data-parsley-group="step-2"
+                                                                    data-parsley-required="true" name="reference" placeholder="Reference- Citation of the publication" class="form-control">
+                                                                  </div>
+                                                            </div>
+                                                            <div class="form-group row m-b-10">
+                                                                    <label for="contactMethod" class="col-md-3 text-md-left col-form-label">
+                                                                            Have the data been published?                                                                            <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-6">
+                                                                        
+                                                                        Yes <input type="radio" name="published" id="published" value="yes" required>
+                                                                        No <input type="radio" name="published" id="published" value="no" required>
+                                                                    </div>
+                                                                    <!-- <label class="col-md-3 text-md-left col-form-label">Embargo</label>
+                                                                    <input type="radio" name="yes_no2" onclick="check2(0)" unchecked>Yes</input>
+                                                                      <input type="radio" name="yes_no2" onclick="check2(1)">No</input> -->
+                                                                </div>
+                                                        <div class="form-group row m-b-10">
+                                                            <label for="contactMethod" class="col-md-3 text-md-left col-form-label">
+                                                                Embargo <span class="text-danger">*</span></label>
+                                                            <div class="col-md-6">
+                                                                
+                                                                Yes <input type="radio" name="embargo" id="embargo" value="1" required="">
+                                                                No <input type="radio" name="embargo" id="embargo" value="0">
+                                                            </div>
+                                                            <!-- <label class="col-md-3 text-md-left col-form-label">Embargo</label>
+                                                            <input type="radio" name="yes_no2" onclick="check2(0)" unchecked>Yes</input>
+                                                              <input type="radio" name="yes_no2" onclick="check2(1)">No</input> -->
+                                                        </div>
+                                                        <div class="form-group row m-b-10">
+                                                            <label class="col-md-3 text-md-left col-form-label">Date</label>
+                                                            <div class="col-md-8">
+                                                                    <input type="date" name="releaseDate" max="3000-12-31" 
+                                                                    min="1000-01-01" class="form-control" >
+                                                            </div>
+                                                        </div>
+                                            </div>
+                                        </div>
+
+
+                                        
+                                        
+                                        <!-- begin form-group row -->
+                                        
+                                      <!-- end col-8 -->
+                                    </div>
+                                    <!-- end row -->
+                                  </fieldset>
+                                
+                                <!-- end fieldset -->
+                              </div>
+                              <!-- end step-2 -->
+                              <!-- begin step-3 -->
+                              <div id="step-3" class="step-content">
+                                <!-- begin fieldset -->
+                                <fieldset>
+                                  <!-- begin row -->
+                                  <div class="row">
+                                    <!-- begin col-8 -->
+                                    <div class="col-md-8 offset-md-2">
+                                      <legend class="no-border f-w-700 p-b-0 m-t-0 m-b-20 f-s-16 text-inverse">Upload Files</legend>
+                                      <!-- begin form-group row -->
+                                      <div class="form-group">
+                                            <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                      <span class="input-group-text" id="inputGroupFileAddon01">Metadata Files
+                                                             <span class="text-danger">*</span>
+                                                      </span>
+                                                    </div>
+                                                    <div class="custom-file">
+                                                      <input type="file" class="custom-file-input" 
+                                                        name="metadataFile"
+                                                      id="metadataFile"
+                                                        aria-describedby="inputGroupFileAddon01" data-parsley-group="step-3"
+                                                        data-parsley-required="true">
+                                                      <label class="custom-file-label" for="metadataFile">Choose file</label>
+                                                    </div>
+                                                </div>
+                                      </div>
+                                        <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                  <span class="input-group-text" id="irawFileAddon01">Raw files 
+                                                         <span class="text-danger">*</span>
+                                                  </span>
+                                                </div>
+                                                <div class="custom-file">
+                                                  <input type="file" 
+                                                    name="rawFile"
+                                                  class="custom-file-input" id="rawFile"
+                                                    aria-describedby="irawFileAddon01" data-parsley-group="step-3"
+                                                    data-parsley-required="true">
+                                                  <label class="custom-file-label" for="rawFile">Choose file</label>
+                                                </div>
+                                            </div>
+                                      
+                                      
+                                    <!-- end col-8 -->
+                                  </div>
+                                  <!-- end row -->
+                                </fieldset>
+                                <!-- end fieldset -->
+                              </div>
+                              <!-- end step-3 -->
+                              <!-- begin step-4 -->
+                              <!-- <div id="step-4" class="step-content">
+                                <div class="jumbotron m-b-0 text-center">
+                                  <h2 class="text-inverse">Submission has passed first check!!</h2>
+                                  <p class="m-b-30 f-s-16">You will be advised if we find corrupted files. </p>
+                                  <p><a href="javascript:;" class="btn btn-primary btn-lg">Return to Home page</a></p>
+                                </div>
+                              </div> -->
+                              <!-- end step-4 -->
+                            
+                            <!-- end wizard-content -->
+                        </div>
+                          <!-- end wizard -->
+                      </form>
+                        
+                </div>
+            </div>
+
+            
+            
+                <script>
+                function check(x)
+                {
+                    if(x==0)
+                    document.getElementById("ref1").style.display='block';
+                    else
+                    document.getElementById("ref1").style.display='none';
+                    return
+                }
+                </script>
+                
+                <script>
+                        function check2(x)
+                        {
+                            if(x==0)
+                            document.getElementById("emb").style.display='block';
+                            else
+                            document.getElementById("emb").style.display='none';
+                            return
+                        }
+                        </script>
+            
+    
+
+    <!-- jQuery first, then Tether, then Bootstrap JS. -->
+    <!-- <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script> -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script> -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="js/parsley.js"></script>
+    <script type="text/javascript" src="js/smart-wizard.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+   <script>
+      $(document).ready(function() {
+        FormWizardValidation.init();
+      });
+    </script>
+    
+  
+</body>
+</html>

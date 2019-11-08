@@ -22,8 +22,8 @@ exports.uploadResearch = (req, res, next) => {
     const submissionType = body.type;
     const embargo = body.embargo;
     const releaseDate = body.embargoDate;
-    // const metadataFile = req.files["metadataFile"][0];
-    // const rawFile = req.files["rawFile"][0];
+    const metadataFile = req.files["metadataFile"][0];
+    const rawFile = req.files["rawFile"][0];
 
     
     
@@ -92,6 +92,7 @@ exports.uploadResearch = (req, res, next) => {
         // console.log("ds")
         // fileFuncs.unzipFile("fdfd")
     })
+    //-------separate old from new
     
     // Get metadata file first line  columns
     // Get the darwin base on the type of submission
@@ -109,6 +110,7 @@ exports.uploadResearch = (req, res, next) => {
     //     })
     // res.redirect("/list-files")
 }
+
 exports.getResearches = (req, res, next) => {
     
     Research.getDarwin("museum")

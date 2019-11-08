@@ -6,3 +6,34 @@
 .cursor {
 	cursor: pointer;
 }
+.parsley-errors-list {
+    padding: 0!important;
+    list-style-type: none!important;
+    margin: 0!important;
+    color: #e5603b;
+    font-size: 12px!important;
+    line-height: inherit!important;
+}
+.parsley-errors-list.filled {
+    opacity: 1;
+}
+
+.parsley-errors-list.filled {
+    margin-top: 5px!important;
+}
+.parsley-error {
+    background: #fff!important;
+    border-color: #ff5b57!important;
+}
+.alert.alert-danger.step-content{
+	display: block !important;
+	border-radius: 0;
+	background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+.alert.alert-success.step-content{
+	display: block !important;
+	border-radius: 0;
+	background-color: #d4edda;
+    border-color: #c3e6cb;
+}

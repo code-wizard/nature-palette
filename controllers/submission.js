@@ -1,58 +1,159 @@
-const csv = require('csv-parser');
-const fs = require('fs');
+// const csv = require('csv-parser');
+// const fs = require('fs');
 const submissionModel = require("../models/submission");
-const metaDataController = require("../controllers/metadata");
+// const metaDataController = require("../controllers/metadata");
+const fileFuncs = require("../util/file_functions")
+const path = require("path");
+const Research = require("../models/research");
+const multer = require("multer")
+const _ = require("lodash");
+const processRawFiles = require("../util/agenda")
 
 module.exports.uploadSubmission = (req, res) => {
 
-    const body = req.body;
+    if(req.method === "POST"){
+        const body = req.body;
 
-    submission = new submissionModel();
-    submission.firstName = body.firstName;
-    submission.lastName = body.lastName;
-    submission.description = body.description;
-    submission.email = body.email;
-    submission.institutionAffiliation = body.institutionAffiliation;
-    submission.typeOfData = body.typeOfData;
-    submission.dataFrom = body.dataFrom;
-    submission.published = body.published;
-    submission.reference = body.reference;
-    submission.embargo = body.embargo;
-    submission.metaDataFile = req.file;
-    // submission.statusValid = false; // will change when validation comes
-
-    var insertedSubmissionId;
-    var savePromise = new Promise((resolve, reject) => {
-        resolve(submission.save());
-    });
-
-    savePromise.then(function(value){
-        insertedSubmissionId = value;
-        
-        // reading metadata file
-        var filePath = submission.metaDataFile.path;
-        new Promise((resolve, reject) => {
-            var results = [];
-            fs.createReadStream(filePath)
-                .pipe(csv())
-                .on('data', (data) => results.push(data))
-                .on('end', () => {
-                    resolve(results);
-                });
-        }).then(function (value) {
-            
-            // after read, insert meta data file list
-            var contentOfMetaDataFile = value;
-            contentOfMetaDataFile.forEach(element => {
-                element.submissionId = insertedSubmissionId;
+        submission = new submissionModel();
+        submission.firstName = body.firstName;
+        submission.lastName = body.lastName;
+        submission.description = body.description;
+        submission.email = body.email;
+        submission.institutionAffiliation = body.institutionAffiliation;
+        submission.typeOfData = body.typeOfData;
+        submission.dataFrom = body.dataFrom;
+        submission.doi = body.doi;
+        submission.releaseDate = body.releaseDate;
+        submission.reference = body.reference;
+        submission.published = body.published;
+        submission.embargo = body.embargo;
+        const metadataFile = req.files.metadataFile;
+        const rawFile = req.files.rawFile;
+        let missingRFields = []
+        const rm = []
+        const hm = []
+        data = []
+        // console.log(submission)
+        // submission.statusValid = false; // will change when validation comes
+        // console.log(req.files.metadataFile, req.files.length)
+        if (!metadataFile || !rawFile) {
+            return res.status(422).render("submission", {
+                title: "Nature Palette - Upload",
+                hasError: true,
+                success: false,
+                errorMessage: "Attach only .csv or .zip file"
             });
-            metaDataController.uploadMetaData(contentOfMetaDataFile);
+        } 
+        else if (parseInt(submission.embargo) && !submission.releaseDate) {
+            return res.status(422).render("submission", {
+                title: "Nature Palette - Upload",
+                hasError: true,
+                success: false,
+                errorMessage: "Please specify embargo expiry date"
+            });
+        }
+        // create a stream to read the csv
+        const stream = fileFuncs.readRows("data-files/" + metadataFile[0].filename, {
+            mapHeaders: ({ header, index }) => _.replace(header.toLowerCase(), " ", "")
+          } )
+          // Get the required field
+        if(body.dataFrom === "field")
+          requireField = fileFuncs.fieldData()
+        else
+          requireField = fileFuncs.museumData()
+        
+        // Make metadata lower case
+        for (f of requireField){
+            rm.push(f.toLocaleLowerCase())
+        }
+        let index = 0;
+        stream.on('headers', (headers) => {
+          
+            const intersection = _.intersection(rm, headers)
+            console.log(intersection, "Intersection", rm, headers)
+            
+            if (intersection.length != requireField.length){
+                missingRFields = _.difference(rm, intersection)
+                console.log(missingRFields)
+                     return res.status(422).render("submission", {
+                            title: "Nature Palette - Upload",
+                            hasError: true,
+                            success: false,
+                            errorMessage: `Your metadata is missing some required fileds ${missingRFields}`
+                        });
+            }
+            else {
+                // processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
+            //  "data-files/" + rawFile[0].filename, rm)
+             submission.save()
+             .then( (id)=> {
+                 console.log(id, "Hello world")
+                 processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
+             "data-files/" + rawFile[0].filename, id, rm, res)
+                // res.redirect("/upload-success")
+             })
+             .catch((err)=>{
+                console.log("unable to save submission",err)
+             })
+                // res.redirect("/upload-success")
+            }
+            stream.destroy()
+            
+          })
+        .on('data', (row) => {
+            // processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
+            //  "data-files/" + rawFile[0].filename, rm)
+            
+            stream.destroy()
+            // console.log(index++, "fdfd", row)
+            // data.push(row);
+            // console.log(row)
         })
-    });
+        .on("end", () => {
+            // console.log(data, "Done")
+            // console.log("ds")
+            // fileFuncs.unzipFile("fdfd")
+        })
 
+        // var insertedSubmissionId;
+        // var savePromise = new Promise((resolve, reject) => {
+        //     resolve(submission.save());
+        // });
+        // savePromise.then(function(value){
+        //     insertedSubmissionId = value;
+            
+        //     // reading metadata file
+        //     var filePath = submission.metaDataFile.path;
+        //     new Promise((resolve, reject) => {
+        //         var results = [];
+        //         fs.createReadStream(filePath)
+        //             .pipe(csv())
+        //             .on('data', (data) => results.push(data))
+        //             .on('end', () => {
+        //                 resolve(results);
+        //             });
+        //     }).then(function (value) {
+                
+        //         // after read, insert meta data file list
+        //         var contentOfMetaDataFile = value;
+        //         contentOfMetaDataFile.forEach(element => {
+        //             element.submissionId = insertedSubmissionId;
+        //         });
+        //         metaDataController.uploadMetaData(contentOfMetaDataFile);
+        //     })
+        // });
+        // }
+    } else {
+        res.render('submission', {
+            title: "Submit Research",
+            hasError: false,
+            success: false,
+        })
+    }
     // kaydet
-    res.redirect("/list-files");
+    
 }
+
 
 exports.getListSubmission = (req, res, next) => {
     submissionModel.getAll()
@@ -65,4 +166,8 @@ exports.getListSubmission = (req, res, next) => {
         .catch(err => {
             console.log(err)
         })
+}
+
+exports.getUploadSuccess = (req, res, next) => {
+    res.render("subsuccess")
 }
