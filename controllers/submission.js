@@ -6,6 +6,7 @@ const fileFuncs = require("../util/file_functions")
 const path = require("path");
 const Research = require("../models/research");
 const multer = require("multer")
+const dateFn = require("date-fns")
 const _ = require("lodash");
 const processRawFiles = require("../util/agenda")
 
@@ -33,9 +34,7 @@ module.exports.uploadSubmission = (req, res) => {
         const rm = []
         const hm = []
         data = []
-        // console.log(submission)
-        // submission.statusValid = false; // will change when validation comes
-        // console.log(req.files.metadataFile, req.files.length)
+        console.log(metadataFile)
         if (!metadataFile || !rawFile) {
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
@@ -52,8 +51,42 @@ module.exports.uploadSubmission = (req, res) => {
                 errorMessage: "Please specify embargo expiry date"
             });
         }
+        else if(submission.releaseDate && dateFn.getYear(new Date(submission.releaseDate)) < dateFn.getYear(new Date())){
+            return res.status(422).render("submission", {
+                title: "Nature Palette - Upload",
+                hasError: true,
+                success: false,
+                errorMessage: "Embargo release date must be in the future."
+            });
+        }
+        
+        else if(submission.releaseDate && dateFn.differenceInYears(new Date(), new Date(submission.releaseDate))>1) {
+            return res.status(422).render("submission", {
+                title: "Nature Palette - Upload",
+                hasError: true,
+                success: false,
+                errorMessage: "Embargo release date must not be greater then 1 year from today."
+            });
+        }
+        else if(submission.published === "yes" && !submission.doi){
+            return res.status(422).render("submission", {
+                title: "Nature Palette - Upload",
+                hasError: true,
+                success: false,
+                errorMessage: "Digital Object Reference is required for a published research."
+            });
+        }
+        else if(submission.published === "yes" && !submission.reference){
+            return res.status(422).render("submission", {
+                title: "Nature Palette - Upload",
+                hasError: true,
+                success: false,
+                errorMessage: "Reference is required for a published research."
+            });
+        }
+        
         // create a stream to read the csv
-        const stream = fileFuncs.readRows("data-files/" + metadataFile[0].filename, {
+        const stream = fileFuncs.readRows(metadataFile[0].path, {
             mapHeaders: ({ header, index }) => _.replace(header.toLowerCase(), " ", "")
           } )
           // Get the required field
@@ -83,13 +116,10 @@ module.exports.uploadSubmission = (req, res) => {
                         });
             }
             else {
-                // processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
-            //  "data-files/" + rawFile[0].filename, rm)
              submission.save()
              .then( (id)=> {
                  console.log(id, "Hello world")
-                 processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
-             "data-files/" + rawFile[0].filename, id, rm, res)
+                 processRawFiles.readRawFiles(metadataFile[0].path,rawFile[0].path, id, rm, res)
                 // res.redirect("/upload-success")
              })
              .catch((err)=>{

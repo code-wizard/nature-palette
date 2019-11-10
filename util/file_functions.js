@@ -23,61 +23,89 @@ const unzipRawFiles = (filepath, errorrMessage, metadata, fileNames)=>{
         file: filepath,
         storeEntries: true
     });
-    //hold the name of the folder
-    let dirName 
+    //hold the name of the zipped folder
+    let zipdirName 
     zip.on('ready', () => {
         rawFiles = []
         if(zip.entriesCount-1 !== fileNames.length){
+            console.log("entered here")
             errorrMessage.push({message: "Metadata filenames does not match the number of raw files uploaded. Only matching files will be released"})
+            //send email to client with error messages
+            return
         }
-        for (const  [index, [, entry]] of Object.entries(Object.entries(zip.entries()))) {
-            // console.log(index, entry)
-            const desc = entry.isDirectory ? 'directory' : `${entry.size} bytes`;
-            if (!entry.isDirectory){
-                i++
-                console.log(fileNames[i], entry.name)
-                if (entry.name.includes(fileNames[i])) {
-                        // console.log("File exists", i, entry.name,dirName,"fdfdfd", _.replace(entry.name, dirName, ""))
-                        let filename = _.replace(entry.name, dirName, "")
-                        let dirPath = 'data-files/raw-output/'+filename;
-                        rawFiles.push({
-                            metadata: metadata[i]._id,
-                            path: dirPath,
-                            type: '',
-                            fileName: filename
-                        })
-                        zip.extract(entry.name, dirPath, err=>{
-                            errorrMessage.push({message:  " Could not read "+filename})
-                        })
+        const dirName = 'data-files/raw-files-output/' + metadata[0].submissionId
+        fs.mkdir('data-files/raw-files-output/' + metadata[0].submissionId, { recursive: true }, (err) => {
+            //throws error if unable to create director
+            if (err) throw err;
+
+            for (const  [index, [, entry]] of Object.entries(Object.entries(zip.entries()))) {
+                // console.log(index, entry)
+                // const desc = entry.isDirectory ? 'directory' : `${entry.size} bytes`;
+                if (!entry.isDirectory){
+                    i++
+                    let filename = _.replace(entry.name, zipdirName, "")
+                    if (entry.name.includes(fileNames[i])) {
+                            // console.log("File exists", i, entry.name,dirName,"fdfdfd", _.replace(entry.name, dirName, ""))
+                            
+                            // console.log(dirName, "Meta data")
+                            let dirPath = dirName+"/"+filename;
+                            metadata[i]["valid"] = true
+                            rawFiles.push({
+                                metadata: metadata[i]._id,
+                                path: dirPath,
+                                type: '',
+                                fileName: filename
+                            })
+                            zip.extract(entry.name, dirPath, err=>{
+                                // console.log(entry.name, "Nand", dirPath, "Couldn't")
+                                // errorrMessage.push({message:  " Could not read "+filename})
+                            })
+                    } else {
+                        errorrMessage.push({message: filename+ " was not released. No matching metadata row"})
+                        // remove the meta data without a matching file
+                        metadata[i]["valid"] = false
+                        console.log("No way!")
+                        continue
+                    }
+                    
                 } else {
-                    errorrMessage.push({message: filename+ " was not released. No matching metadata row"})
+                    zipdirName = entry.name
+                    i = index - 1
                 }
-            } else {
-                dirName = entry.name
-                i = index - 1
+                // console.log(`Entry ${entry.name}: ${desc}`);
             }
-            // console.log(`Entry ${entry.name}: ${desc}`);
-        }
-        MetaData.saveMany(metadata)
-        .then(
-            (result)=>{
+            // console.log(rawFiles, "Here")
+            // Note to self, try moving the saving of metadata and raw to a new background process after the 
+            // Validation is done 
+            try{
+                MetaData.saveMany(metadata.filter((item)=>{return item.valid}))
+                console.log("done saving", metadata.filter((item)=>item.valid))
                 RawFile.saveMany(rawFiles)
-                then((rawResult)=>{
-                    console.log("saved raw file")
-                })
-                .catch((err)=>{
-                    console.log("error saving raw file", err)
-                })
+                console.log("Saving Rawfiles done", rawFiles)
+                // Send email to client with list of errors
+            } catch(err){
+                console.log("error saving metadata", err)
             }
-        )
-        .catch((err)=>{
-            console.log("error saving metadata", err)
-        })
+
+          });
+        
+        // try{
+        //     MetaData.saveMany(metadata)
+        //     console.log("done saving")
+        // } catch(err){
+        //     console.log("error saving metadata", err)
+        // }
+        // try{
+        //     RawFile.saveMany(rawFiles)
+        // } catch(err){
+        //     console.log("error saving raw file", err)
+        // }
         
         // Do not forget to close the file once you're done
-        console.log(errorrMessage)
+        
         // zip.close()
     });
+    
     // let index = 0
     // fs.createReadStream(filepath)
     // .pipe(unzip.Parse())

@@ -65,6 +65,12 @@ module.exports = class MetaData {
     static saveMany(list){
         const db = getDb()
         return db.collection("metadata").insertMany(list)
+        .then(result=> {
+            console.log("hellow world")
+        })
+        .catch((err)=>{
+            console.log("hellow world", err)
+        })
         
     }
     save() {

@@ -41,7 +41,7 @@ readRawFiles = (csvPath, rawFilePath, submissionId, required,  res)=>{
             }
             if(!flag) {
                 row["submissionId"] = submissionId;
-                row["_id"] = submissionId + row.filename
+                row["_id"] = index +"-"+submissionId + Date.now() + row.filename
                 fileNames.push(row["filename"])
                 metaData.push(row)
             }
@@ -51,7 +51,8 @@ readRawFiles = (csvPath, rawFilePath, submissionId, required,  res)=>{
         .on("end", () => {
             // console.log(errorrMessage, "error messages Done")
             // console.log("Done", metaData)
-            // console.log("Done", metaData.length)
+            console.log("Done", metaData.length, "Out")
+            fileFuncs.unzipFile(rawFilePath,errorrMessage, metaData, fileNames)
             
             
         })
@@ -70,7 +71,7 @@ agenda.on( "ready", function() {
     agenda.start()
     agenda.now('processRawFile', storeFiles)
     .then( (data)=>{
-        console.log("done", data)
+        console.log("done")
         // storeFiles()
         
     })

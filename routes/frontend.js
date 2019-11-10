@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 // const path = require("path");
+const tmp = require('tmp');
 const researches = []
 const path = require("path")
 const multer = require("multer");
@@ -8,20 +9,22 @@ const frontendControllers = require("../controllers/frontend");
 
 
 //  EBU MULTER
-/*
+
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "data-files")
+        // create tmp directory 
+        tmpobj = tmp.dirSync();
+        console.log('Dir: ', tmpobj.name);
+        cb(null, tmpobj.name)
     },
     filename: (req, file, cb) => {
-        cb(null, new Date().toISOString() + "-" + file.originalname)
+        cb(null, Date.now() + "-" + file.originalname)
     }
 });
 const fileFilter = (req, file, cb) => {
     console.log(file)
     if(file.fieldname === "metadataFile"){
         if (file.mimetype === 'text/csv' || path.extname(file.originalname) === ".csv" ){
-            console.log("hello world cvs")
             cb(null, true)
         } else{
             cb(null, false)
@@ -35,35 +38,36 @@ const fileFilter = (req, file, cb) => {
         }
     }
 }
-*/
+
 
 
 // YALIN MULTER
-const fileStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "data-files")
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + "-" + file.originalname)
-    }
-});
-const fileFilter = (req, file, cb) => {
-    if (file.fieldname === "metadataFile") {
-        var ext = path.extname(file.originalname);
-        if (ext == '.csv') {
-            cb(null, true)
-        } else {
-            cb(null, false)
-        }
-    } else {
-        var ext = path.extname(file.originalname);
-        if (ext == '.zip') {
-            cb(null, true)
-        } else {
-            cb(null, false)
-        }
-    }
-}
+// const fileStorage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+        
+//         cb(null, "data-files")
+//     },
+//     filename: (req, file, cb) => {
+//         cb(null, Date.now() + "-" + file.originalname)
+//     }
+// });
+// const fileFilter = (req, file, cb) => {
+//     if (file.fieldname === "metadataFile") {
+//         var ext = path.extname(file.originalname);
+//         if (ext == '.csv') {
+//             cb(null, true)
+//         } else {
+//             cb(null, false)
+//         }
+//     } else {
+//         var ext = path.extname(file.originalname);
+//         if (ext == '.zip') {
+//             cb(null, true)
+//         } else {
+//             cb(null, false)
+//         }
+//     }
+// }
 
 const upload = multer({
     storage: fileStorage,

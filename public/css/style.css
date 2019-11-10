@@ -37,3 +37,10 @@
 	background-color: #d4edda;
     border-color: #c3e6cb;
 }
+
+.hide{
+	display: none
+}
+.show{
+	display: block
+}

@@ -12,6 +12,12 @@ module.exports = class RawFile {
     static saveMany(list){
         const db = getDb()
         return db.collection("rawfile").insertMany(list)
+        .then((result)=>{
+            console.log("saved rawfiles")
+        })
+        .catch((err)=>{
+            console.log("Hello world error", err)
+        })
     }
     save(){
         const db = getDb();

@@ -1,14 +1,30 @@
-// $(document).ready(()=>{
-//     $("#embargo").on("change", function(){
-//         if($(this).is(":checked")){
-//             // console.log("tete")
-//             $("#embargoDateField").show();
-//         } else {
-//             // console.log("oweowro")
-//             $("#embargoDateField").hide();
-//         }
-//     })
-// })
+$(document).ready(()=>{
+    $("[name='embargo']").on("change", function(){
+        console.log($(this).val(), "hjfdbfjdb")
+        if($(this).val() === "1"){
+            console.log("tete")
+            $("#releaseDateDiv").show();
+        } else {
+            console.log("oweowro")
+            $("#releaseDateDiv").hide()
+        }
+    })
+})
+$(document).ready(()=>{
+    $("[name='published']").on("change", function(){
+        if($(this).val() === "yes"){
+            console.log("tete12")
+            $("#doiReference").show();
+        } else {
+            console.log("oweowro12")
+            $("#doiReference").hide();
+        }
+    })
+})
+
+$(document).on('change', '.custom-file-input', function (event) {
+    $(this).next('.custom-file-label').html(event.target.files[0].name);
+})
 
 var btnCancel = $('<button></button>')
 .text('Cancel') .addClass('btn btn-danger') 
