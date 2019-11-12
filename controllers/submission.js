@@ -34,7 +34,8 @@ module.exports.uploadSubmission = (req, res) => {
         const rm = []
         const hm = []
         data = []
-        console.log(metadataFile)
+        // console.log(metadataFile)
+        
         if (!metadataFile || !rawFile) {
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
@@ -103,7 +104,7 @@ module.exports.uploadSubmission = (req, res) => {
         stream.on('headers', (headers) => {
           
             const intersection = _.intersection(rm, headers)
-            console.log(intersection, "Intersection", rm, headers)
+            // console.log(intersection, "Intersection", rm, headers)
             
             if (intersection.length != requireField.length){
                 missingRFields = _.difference(rm, intersection)
@@ -118,7 +119,7 @@ module.exports.uploadSubmission = (req, res) => {
             else {
              submission.save()
              .then( (id)=> {
-                 console.log(id, "Hello world")
+                //  console.log(id, "Hello world")
                  processRawFiles.readRawFiles(metadataFile[0].path,rawFile[0].path, id, rm, res)
                 // res.redirect("/upload-success")
              })

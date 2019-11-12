@@ -32,7 +32,7 @@ readRawFiles = (csvPath, rawFilePath, submissionId, required,  res)=>{
                 // console.log(row[h])
                 if(!row[h])  {
                     errorrMessage.push({message: row[h] + " is missing a value  at row no " + parseInt(index + 1)})
-                    console.log("failed", index)
+                    // console.log("failed", index)
                     flag = true
                     break;
                 }
@@ -51,7 +51,7 @@ readRawFiles = (csvPath, rawFilePath, submissionId, required,  res)=>{
         .on("end", () => {
             // console.log(errorrMessage, "error messages Done")
             // console.log("Done", metaData)
-            console.log("Done", metaData.length, "Out")
+            // console.log("Done", metaData.length, "Out")
             fileFuncs.unzipFile(rawFilePath,errorrMessage, metaData, fileNames)
             
             

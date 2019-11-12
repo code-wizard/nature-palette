@@ -5,6 +5,10 @@ const StreamZip = require("node-stream-zip")
 const RawFile = require("../models/rawfile");
 const MetaData = require("../models/metadata")
 // const processRawFiles = require("../util/agenda")
+const rOperation = require("r-script");
+
+// const rScriptPath = './util/calcMetrics.R';
+const rScriptPath = './util/deneme.R';
 
 const readRows = (filepath, option) => {
     // filepath = "data-files/2019-11-06T15:31:22.845Z-2019.09.19 Example of Metadata file limited Darwin core terms.csv"
@@ -28,7 +32,7 @@ const unzipRawFiles = (filepath, errorrMessage, metadata, fileNames)=>{
     zip.on('ready', () => {
         rawFiles = []
         if(zip.entriesCount-1 !== fileNames.length){
-            console.log("entered here")
+            //  console.log("entered here", fileNames)
             errorrMessage.push({message: "Metadata filenames does not match the number of raw files uploaded. Only matching files will be released"})
             //send email to client with error messages
             return
@@ -64,9 +68,12 @@ const unzipRawFiles = (filepath, errorrMessage, metadata, fileNames)=>{
                         errorrMessage.push({message: filename+ " was not released. No matching metadata row"})
                         // remove the meta data without a matching file
                         metadata[i]["valid"] = false
-                        console.log("No way!")
+                        // console.log("No way!")
                         continue
                     }
+
+                    // raw files R script check
+                    rScriptTrigger(filename)
                     
                 } else {
                     zipdirName = entry.name
@@ -79,9 +86,9 @@ const unzipRawFiles = (filepath, errorrMessage, metadata, fileNames)=>{
             // Validation is done 
             try{
                 MetaData.saveMany(metadata.filter((item)=>{return item.valid}))
-                console.log("done saving", metadata.filter((item)=>item.valid))
+                // console.log("done saving", metadata.filter((item)=>item.valid))
                 RawFile.saveMany(rawFiles)
-                console.log("Saving Rawfiles done", rawFiles)
+                // console.log("Saving Rawfiles done", rawFiles)
                 // Send email to client with list of errors
             } catch(err){
                 console.log("error saving metadata", err)
@@ -146,3 +153,24 @@ module.exports = {
 
 // Mandatory Fields:
 // ["FileName","UniqueID","genus","specificEpithet","Patch","LightAngle1","LightAngle2","ProbeAngle1","ProbeAngle2","Replicate"]
+
+
+function rScriptTrigger(rawFilePath) {
+
+    new Promise((resolve, reject) => {
+        rOperation(rScriptPath)
+            .data({
+                rawFilePath : rawFilePath
+            })
+            .call(function (err, d) {
+                if (err) throw err;
+                resolve(d)
+            })
+    }).then(function (value) {
+
+        // prints out result of R script - value
+        console.log(value);
+
+        // TODO : will check metrics then inform user
+    });
+}
