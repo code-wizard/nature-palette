@@ -33,7 +33,7 @@ app.use(fontendData.routes);
 
 app.use(errorController.get404);
 mongoConnect(() => {
-    app.listen(8080)
+    app.listen(3334)
 })
 
 
