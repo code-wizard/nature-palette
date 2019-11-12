@@ -2,7 +2,7 @@ const mongo = require("mongodb");
 mongoClient = mongo.MongoClient
 let _db;
 const mongoConnect = callback => {
-    mongoClient.connect("mongodb://localhost:27017/nature-palette", {
+    mongoClient.connect("mongodb://localhost:27017/nature-palette", { 
             useUnifiedTopology: true
         })
 
