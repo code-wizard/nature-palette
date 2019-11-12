@@ -1,6 +1,6 @@
-node_modules
-data-files/
-data-files
+#node_modules
+#data-files/
+#data-files
 #util/database.js
 .DS_Store
 util/calcMetrics.R
