@@ -1,6 +1,6 @@
-# node_modules
-# data-files
-# node_modules
+node_modules
 data-files
 util/database.js
 .DS_Store
+util/calcMetrics.R
+util/deneme.R
