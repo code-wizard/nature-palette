@@ -34,7 +34,6 @@ module.exports.uploadSubmission = (req, res) => {
         const rm = []
         const hm = []
         data = []
-        console.log(metadataFile)
         if (!metadataFile || !rawFile) {
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
@@ -119,8 +118,8 @@ module.exports.uploadSubmission = (req, res) => {
              submission.save()
              .then( (id)=> {
                  console.log(id, "Hello world")
-                 processRawFiles.readRawFiles(metadataFile[0].path,rawFile[0].path, id, rm, res)
-                // res.redirect("/upload-success")
+                 processRawFiles.readRawFiles(submission, metadataFile[0].path,rawFile[0].path, id, rm, res)
+                res.redirect("/upload-success")
              })
              .catch((err)=>{
                 console.log("unable to save submission",err)
