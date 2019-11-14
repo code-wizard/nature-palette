@@ -73,7 +73,8 @@ const unzipRawFiles = (filepath, errorrMessage, metadata, fileNames)=>{
                     }
 
                     // raw files R script check
-                    rScriptTrigger(filename)
+                    // TODO : R SCRIPT COMMAND HERE 
+                    // rScriptTrigger(filename)
                     
                 } else {
                     zipdirName = entry.name
@@ -171,6 +172,10 @@ function rScriptTrigger(rawFilePath) {
         // prints out result of R script - value
         console.log(value);
 
-        // TODO : will check metrics then inform user
+        // TODO : will check metrics, if yes then make submission flag TRUE then inform user
+    })
+    .catch(err => {
+        // send email to user that there is a problem
+        console.log(err)
     });
 }

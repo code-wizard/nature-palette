@@ -1,8 +1,11 @@
 const mongo = require("mongodb");
 mongoClient = mongo.MongoClient
 let _db;
+
+const stringquery = 'mongodb://localhost:27017/nature-palette'
+
 const mongoConnect = callback => {
-    mongoClient.connect("mongodb://localhost:27017/nature-palette", { 
+    mongoClient.connect(stringquery, { 
             useUnifiedTopology: true
         })
 
@@ -25,3 +28,4 @@ const getDb = () => {
 }
 exports.mongoConnect = mongoConnect;
 exports.getDb = getDb;
+exports.stringquery = stringquery;

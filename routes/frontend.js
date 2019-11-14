@@ -94,6 +94,8 @@ router.post("/submission", upload.fields([{
 ]), submissionController.uploadSubmission);
 router.get("/submission", submissionController.uploadSubmission);
 router.get("/list-files", submissionController.getListSubmission);
+router.get("/search", submissionController.searchView);
+router.post("/search", submissionController.getListSubmission);
 //router.get("/metadata-files", metaDataController.getListOfMetaDataFile);
 
 

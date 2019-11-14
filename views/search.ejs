@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+        integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap Date-Picker Plugin -->
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css" />
+    <link rel="stylesheet" href="css/smart_wizard.css" />
+    <link rel="stylesheet" href="css/parsley.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        .jumbotron {
+            padding: 0.5em 0.6em;
+        }
+
+        body {
+            font-family: Roboto;
+        }
+
+        form.example input[type=text] {
+            padding: 10px;
+            font-size: 17px;
+            border: 1px solid grey;
+            float: left;
+            width: 80%;
+            background: #f1f1f1;
+        }
+
+        form.example button {
+            float: left;
+            width: 10%;
+            padding: 10px;
+            background: #2196F3;
+            color: white;
+            font-size: 17px;
+            border: 1px solid grey;
+            border-left: none;
+            cursor: pointer;
+        }
+
+        form.example button:hover {
+            background: #0b7dda;
+        }
+
+        form.example::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        h2 {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="main-header">
+        <!-- navbar -->
+        <nav class="navbar navbar-toggleable-md bg-info navbar-inverse">
+            <div class="container">
+                <button class="navbar-toggler" data-toggle="collapse" data-target="#mainNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="row">
+                    <div class="col-md-6 mb-6">
+                        <h2>Nature's Palette</h2>
+                    </div>
+
+                    <div class="col-md-6 mb-6">
+                        <div class="collapse navbar-collapse" id="mainNav">
+                            <div class="navbar-nav">
+                                <a class="nav-item nav-link" href="/">Home</a>
+                                <a class="nav-item nav-link active" href="/search">Search</a>
+                                <a class="nav-item nav-link" href="/submission">Upload</a>
+                                <a class="nav-item nav-link" href="#">Join</a>
+                                <a class="nav-item nav-link" href="#">About</a>
+                                <a class="nav-item nav-link" href="#">Help</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div>
+            <p></p>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <form class="example" action="search" method="POST">
+                        <input type="text" placeholder="Search.." name="search">
+                        <button type="submit"><i class="fa fa-search"></i></button>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="#demo2" class="btn btn-primary" data-toggle="collapse">Advance Search</a></div>
+            </div>
+        </div>
+        <div>
+            <p></p>
+        </div>
+
+        <div class="container">
+            <div>
+                <p></p>
+            </div>
+            <div id="demo2" class="collapse">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="row " style="display:flex; justify-content: right">
+
+                            <div class="col-md-12  order-md-1">
+
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="institutioncode"
+                                            placeholder="Institution code" value="" name="institutionCode">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="collectioncode"
+                                            name="collectionCode" placeholder="Collection code" value="">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="catalogueno" name="catalogNumber"
+                                            placeholder="Catalogue Number" value="">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="class" placeholder="Class" value=""
+                                            name="className">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="order" placeholder="Order" value=""
+                                            name="order">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="family" placeholder="Family"
+                                            name="family" value="">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="genus" placeholder="Genus"
+                                            name="genus" value="">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="specificEpithet"
+                                            name="specificEpithet" placeholder="Specific Epithet" value="">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="infraspecificEpithet"
+                                            name="infraspecificEpithet" placeholder="Infraspecific Epithet" value="">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="sex" placeholder="Sex" name="sex">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="lifestage" placeholder="Life Stage"
+                                            name="lifeStage" value="">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="country" placeholder="Country"
+                                            name="country" value="">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control" id="patch" placeholder="Patch" value=""
+                                            name="patch">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <button type="reset" value="Reset" class="btn btn-primary">Reset</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+            <div>
+                <p></p>
+            </div>
+        </div>
+
+        </form>
+        </div>
+
+        <% if (listVisible) { %>
+        <div class="container">
+            <div id="demo">
+                <h5>Refine Search by</h5>
+                <div class="container">
+                    <div class="row">
+                        <div><a href="#" class="btn btn-primary">Georeferencing</a>
+                            <a href="#" class="btn btn-primary">Color Space</a></div>
+                    </div>
+                </div>
+                <div>
+                    <p></p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th>firstName</th>
+                                <th>lastName</th>
+                                <th>institutionAffiliation</th>
+                                <th>typeOfData</th>
+                                <th>dataFrom</th>
+                                <th>published</th>
+                                <th>reference</th>
+                                <th>doi</th>
+                                <th>Record Date</th>
+                                <th>Search file icon will come here</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (let submission of submissionList) { %>
+                            <tr class="accordion-toggle">
+                                <td><%= submission.firstName %></td>
+                                <td><%= submission.lastName %></td>
+                                <td><%= submission.institutionAffiliation %></td>
+                                <td><%= submission.typeOfData %></td>
+                                <td><%= submission.dataFrom %></td>
+                                <td><%= submission.published %></td>
+                                <td><%= submission.reference %></td>
+                                <td><%= submission.doi %></td>
+                                <td><%= submission.recordDate %></td>
+                                <td>
+                                    <a class="btn btn-primary" data-toggle="collapse" href="#aa" role="button"
+                                        aria-expanded="false" >
+                                        Show Meta Data
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr id="aa" class="collapse">
+                                <td colspan="9">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>genus</th>
+                                                    <th>specificEpithet</th>
+                                                    <th>infraspecificEpithet</th>
+                                                    <th>sex</th>
+                                                    <th>lifeStage</th>
+                                                    <th>Patch</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% for (let metadata of metadataList) { %>
+                                                <tr class="accordion-toggle">
+                                                    <td><%= metadata.genus %></td>
+                                                    <td><%= metadata.specificEpithet %></td>
+                                                    <td><%= metadata.infraspecificEpithet %></td>
+                                                    <td><%= metadata.sex %></td>
+                                                    <td><%= metadata.lifeStage %></td>
+                                                    <td><%= metadata.patch %></td>
+                                                </tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+
+
+        <!-- jQuery first, then Tether, then Bootstrap JS. -->
+        <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
+            integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n"
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"
+            integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
+            crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+            integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+            crossorigin="anonymous"></script>
+    </header>
+</body>
+
+</html>
