@@ -4,6 +4,7 @@ const _ = require("lodash")
 const StreamZip = require("node-stream-zip")
 const RawFile = require("../models/rawfile");
 const MetaData = require("../models/metadata")
+const emails = require("./emails")
 // const processRawFiles = require("../util/agenda")
 const rOperation = require("r-script");
 
@@ -20,7 +21,7 @@ const readRows = (filepath, option) => {
     
 }
 
-const unzipRawFiles = (filepath, errorrMessage, metadata, fileNames)=>{
+const unzipRawFiles = (submission, filepath, errorrMessage, metadata, fileNames)=>{
     // processRawFiles.readRawFiles("")
     // filepath = "data-files/2019-11-06T15:31:22.850Z-2019.09.19 Example raw files.zip"
     const zip = new StreamZip({
@@ -31,16 +32,19 @@ const unzipRawFiles = (filepath, errorrMessage, metadata, fileNames)=>{
     let zipdirName 
     zip.on('ready', () => {
         rawFiles = []
+        // Contains metadata with corresponding raw files
+        validFilesNames = metadata.filter((item)=> {return !item.flag})
         if(zip.entriesCount-1 !== fileNames.length){
-            //  console.log("entered here", fileNames)
-            errorrMessage.push({message: "Metadata filenames does not match the number of raw files uploaded. Only matching files will be released"})
+            console.log("entered here")
+            errorrMessage.push({message: "Metadata filenames does not match the number of raw files uploaded. Only valid metadata will be released"})
             //send email to client with error messages
-            return
+            // return
         }
-        const dirName = 'data-files/raw-files-output/' + metadata[0].submissionId
-        fs.mkdir('data-files/raw-files-output/' + metadata[0].submissionId, { recursive: true }, (err) => {
+        const dirName = 'data-files/raw-files-output/' + validFilesNames[0].submissionId
+        fs.mkdir('data-files/raw-files-output/' + validFilesNames[0].submissionId, { recursive: true }, (err) => {
             //throws error if unable to create director
             if (err) throw err;
+
 
             for (const  [index, [, entry]] of Object.entries(Object.entries(zip.entries()))) {
                 // console.log(index, entry)
@@ -71,10 +75,6 @@ const unzipRawFiles = (filepath, errorrMessage, metadata, fileNames)=>{
                         // console.log("No way!")
                         continue
                     }
-
-                    // raw files R script check
-                    // TODO : R SCRIPT COMMAND HERE 
-                    // rScriptTrigger(filename)
                     
                 } else {
                     zipdirName = entry.name
@@ -86,48 +86,25 @@ const unzipRawFiles = (filepath, errorrMessage, metadata, fileNames)=>{
             // Note to self, try moving the saving of metadata and raw to a new background process after the 
             // Validation is done 
             try{
-                MetaData.saveMany(metadata.filter((item)=>{return item.valid}))
-                // console.log("done saving", metadata.filter((item)=>item.valid))
+                // MetaData.saveMany(metadata.filter((item)=>{return item.valid}))
+                MetaData.saveMany(metadata)
+                console.log("done saving")
                 RawFile.saveMany(rawFiles)
-                // console.log("Saving Rawfiles done", rawFiles)
+                console.log("Saving Rawfiles done")
+                let message = emails.successMesg(submission);
+                if (errorrMessage.length){
+                    message = emails.prepareErrorMessageHTML(errorrMessage, submission)
+                }
+                emails.sendEmail(submission.email, message)
                 // Send email to client with list of errors
             } catch(err){
                 console.log("error saving metadata", err)
             }
 
           });
-        
-        // try{
-        //     MetaData.saveMany(metadata)
-        //     console.log("done saving")
-        // } catch(err){
-        //     console.log("error saving metadata", err)
-        // }
-        // try{
-        //     RawFile.saveMany(rawFiles)
-        // } catch(err){
-        //     console.log("error saving raw file", err)
-        // }
-        
-        // Do not forget to close the file once you're done
-        
-        // zip.close()
+
     });
-    
-    // let index = 0
-    // fs.createReadStream(filepath)
-    // .pipe(unzip.Parse())
-    // .on('entry', function (entry) {
-    //     var fileName = entry.path;
-    //     var type = entry.type; // 'Directory' or 'File'
-    //     var size = entry.size;
-    //     console.log(index++, fileName)
-    //     // if (fileName === "this IS the file I'm looking for") {
-    //     // entry.pipe(fs.createWriteStream('output/path'));
-    //     // } else {
-    //     // entry.autodrain();
-    //     // }
-    // });
+
 }
 const fieldData = ()=> {
     return ["FileName","UniqueID","genus","specificEpithet","Patch","LightAngle1","LightAngle2","ProbeAngle1","ProbeAngle2","Replicate"]

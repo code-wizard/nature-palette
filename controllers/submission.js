@@ -5,6 +5,7 @@ const metaDataModel = require("../models/metadata");
 // const metaDataController = require("../controllers/metadata");
 const fileFuncs = require("../util/file_functions")
 const path = require("path");
+const Research = require("../models/research");
 const multer = require("multer")
 const dateFn = require("date-fns")
 const _ = require("lodash");
@@ -99,48 +100,49 @@ module.exports.uploadSubmission = (req, res) => {
         }
         let index = 0;
         stream.on('headers', (headers) => {
-
-                const intersection = _.intersection(rm, headers)
-                // console.log(intersection, "Intersection", rm, headers)
-
-                if (intersection.length != requireField.length) {
-                    missingRFields = _.difference(rm, intersection)
-                    console.log(missingRFields)
-                    return res.status(422).render("submission", {
-                        title: "Nature Palette - Upload",
-                        hasError: true,
-                        success: false,
-                        errorMessage: `Your metadata is missing some required fileds ${missingRFields}`
-                    });
-                } else {
-                    submission.save()
-                        .then((id) => {
-                            //  console.log(id, "Hello world")
-                            processRawFiles.readRawFiles(metadataFile[0].path, rawFile[0].path, id, rm, res)
-                            // res.redirect("/upload-success")
-                        })
-                        .catch((err) => {
-                            console.log("unable to save submission", err)
-                        })
-                    // res.redirect("/upload-success")
-                }
-                stream.destroy()
-
-            })
-            .on('data', (row) => {
-                // processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
-                //  "data-files/" + rawFile[0].filename, rm)
-
-                stream.destroy()
-                // console.log(index++, "fdfd", row)
-                // data.push(row);
-                // console.log(row)
-            })
-            .on("end", () => {
-                // console.log(data, "Done")
-                // console.log("ds")
-                // fileFuncs.unzipFile("fdfd")
-            })
+          
+            const intersection = _.intersection(rm, headers)
+            console.log(intersection, "Intersection", rm, headers)
+            
+            if (intersection.length != requireField.length){
+                missingRFields = _.difference(rm, intersection)
+                console.log(missingRFields)
+                     return res.status(422).render("submission", {
+                            title: "Nature Palette - Upload",
+                            hasError: true,
+                            success: false,
+                            errorMessage: `Your metadata is missing some required fileds ${missingRFields}`
+                        });
+            }
+            else {
+             submission.save()
+             .then( (id)=> {
+                 console.log(id, "Hello world")
+                 processRawFiles.readRawFiles(submission, metadataFile[0].path,rawFile[0].path, id, rm, res)
+                res.redirect("/upload-success")
+             })
+             .catch((err)=>{
+                console.log("unable to save submission",err)
+             })
+                // res.redirect("/upload-success")
+            }
+            stream.destroy()
+            
+          })
+        .on('data', (row) => {
+            // processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
+            //  "data-files/" + rawFile[0].filename, rm)
+            
+            stream.destroy()
+            // console.log(index++, "fdfd", row)
+            // data.push(row);
+            // console.log(row)
+        })
+        .on("end", () => {
+            // console.log(data, "Done")
+            // console.log("ds")
+            // fileFuncs.unzipFile("fdfd")
+        })
 
         // var insertedSubmissionId;
         // var savePromise = new Promise((resolve, reject) => {
@@ -148,7 +150,7 @@ module.exports.uploadSubmission = (req, res) => {
         // });
         // savePromise.then(function(value){
         //     insertedSubmissionId = value;
-
+            
         //     // reading metadata file
         //     var filePath = submission.metaDataFile.path;
         //     new Promise((resolve, reject) => {
@@ -160,7 +162,7 @@ module.exports.uploadSubmission = (req, res) => {
         //                 resolve(results);
         //             });
         //     }).then(function (value) {
-
+                
         //         // after read, insert meta data file list
         //         var contentOfMetaDataFile = value;
         //         contentOfMetaDataFile.forEach(element => {
@@ -178,7 +180,7 @@ module.exports.uploadSubmission = (req, res) => {
         })
     }
     // kaydet
-
+    
 }
 
 

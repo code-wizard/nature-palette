@@ -5,7 +5,7 @@ const _ = require("lodash")
 
 const agenda = new Agenda({db: {address: 'mongodb+srv://cjamaefula:dinma1990@cluster0-ck9mx.mongodb.net/nature-palette', collection: 'agendaJobs', options: { useNewUrlParser: true }}});
 
-readRawFiles = (csvPath, rawFilePath, submissionId, required,  res)=>{
+readRawFiles = (submission, csvPath, rawFilePath, submissionId, required,  res)=>{
     let index = 0
     errorrMessage = []
     fileNames = []
@@ -14,7 +14,7 @@ readRawFiles = (csvPath, rawFilePath, submissionId, required,  res)=>{
     // filepath = "data-files/2019-11-06T15:31:22.850Z-2019.09.19 Example raw files.zip"
     // filepath = "data-files/2019-11-06T15:31:22.845Z-2019.09.19 Example of Metadata file limited Darwin core terms.csv"
 
-    agenda.define("processRawFile", async (job) => {
+    agenda.define("processRawFile", {concurrency: 1}, async (job) => {
         const stream = fileFuncs.readRows(csvPath, {
             mapHeaders: ({ header, index }) => _.replace(header.toLowerCase(), " ", "")
           })
@@ -32,7 +32,7 @@ readRawFiles = (csvPath, rawFilePath, submissionId, required,  res)=>{
                 // console.log(row[h])
                 if(!row[h])  {
                     errorrMessage.push({message: row[h] + " is missing a value  at row no " + parseInt(index + 1)})
-                    // console.log("failed", index)
+                    console.log("failed", index)
                     flag = true
                     break;
                 }
@@ -40,26 +40,31 @@ readRawFiles = (csvPath, rawFilePath, submissionId, required,  res)=>{
                 
             }
             if(!flag) {
-                row["submissionId"] = submissionId;
-                row["_id"] = index +"-"+submissionId + Date.now() + row.filename
+                // store metadata file name for valid metadata
                 fileNames.push(row["filename"])
-                metaData.push(row)
             }
+            row["submissionId"] = submissionId;
+            row["_id"] = index +"-"+submissionId + Date.now() + row.filename 
+            console.log(row["_id"], row.filename )
+                
+            row["flag"] = flag;
+            metaData.push(row)
+            // }
             index++
             // console.log(row)
         })
         .on("end", () => {
             // console.log(errorrMessage, "error messages Done")
             // console.log("Done", metaData)
-            // console.log("Done", metaData.length, "Out")
-            fileFuncs.unzipFile(rawFilePath,errorrMessage, metaData, fileNames)
+            console.log("Done", metaData.length, "Out")
+            fileFuncs.unzipFile(submission, rawFilePath,errorrMessage, metaData, fileNames)
             
             
         })
         // fileFuncs.unzipFile(rawFilePath, metaData.length, fileNames)
     })
-    return res.redirect("/upload-success")
     // console.log(agenda)
+    agenda.now('processRawFile', storeFiles)
 }
 
 storeFiles = () =>{
@@ -67,16 +72,18 @@ storeFiles = () =>{
     fs.createReadStream(filepath)
         .pipe(unzip.Extract({ path: 'data-files/unzip' }));
 }
-agenda.on( "ready", function() {
-    agenda.start()
-    agenda.now('processRawFile', storeFiles)
-    .then( (data)=>{
-        console.log("done")
-        // storeFiles()
+
+// agenda.on( "ready", function() {
+//     agenda.start()
+//     agenda.now('processRawFile', storeFiles)
+//     .then( (data)=>{
+//         console.log("done")
+//         // storeFiles()
         
-    })
-  })
+//     })
+//   })
 
 module.exports = {
-    readRawFiles: readRawFiles
+    readRawFiles: readRawFiles,
+    agenda: agenda
 }

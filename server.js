@@ -10,21 +10,14 @@ const fontendData = require("./routes/frontend");
 const adminRoute = require("./routes/admin");
 const errorController = require("./controllers/error");
 const mongoConnect = require("./util/database").mongoConnect;
+const agenda = require("./util/agenda").agenda
+// const emails = require("./util/emails")
 
-// const fileStorage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//         cb(null, "data-files")
-//     },
-//     filename: (req, file, cb) => {
-//         cb(null, new Date().toISOString() + "-" + file.originalname)
-//     }
-// });
-// const fileFilter = (req, file, cb) => {
-//     if (file.mimetype === 'text/csv' || file.mimetype === 'application/zip') {
-//         cb(null, true)
-//     }
-//     cb(null, false)
-// }
+
+
+process.env.NODE_ENV = 'development';
+const config = require('./config.js');
+
 app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single("file"))
 app.use(express.static(path.join(__dirname, "public")));
@@ -33,7 +26,12 @@ app.use(fontendData.routes);
 
 app.use(errorController.get404);
 mongoConnect(() => {
-    app.listen(3334)
+    agenda.on( "ready", function() {
+        agenda.start()
+        console.log("Agenda Connected")
+        app.listen(global.gConfig.node_port)
+      })
+    
 })
 
 

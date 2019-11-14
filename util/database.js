@@ -2,7 +2,7 @@ const mongo = require("mongodb");
 mongoClient = mongo.MongoClient
 let _db;
 
-const stringquery = 'mongodb://localhost:27017/nature-palette'
+const stringquery = 'mongodb+srv://cjamaefula:dinma1990@cluster0-ck9mx.mongodb.net/nature-palette?retryWrites=true&w=majority'
 
 const mongoConnect = callback => {
     mongoClient.connect(stringquery, { 
