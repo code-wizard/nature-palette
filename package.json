@@ -28,7 +28,6 @@
     "node-stream-zip": "^1.8.2",
     "nodemailer": "^6.3.1",
     "pug": "^2.0.4",
-    "r-script": "0.0.4",
     "tmp": "^0.1.0"
   }
 }
