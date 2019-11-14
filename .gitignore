@@ -5,3 +5,4 @@ data-files
 util/database.js
 .DS_Store
 npws.code-workspace
+config.json
