@@ -14,7 +14,7 @@ const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         // create tmp directory 
         tmpobj = tmp.dirSync();
-        console.log('Dir: ', tmpobj.name);
+        // console.log('Dir: ', tmpobj.name);
         cb(null, tmpobj.name)
     },
     filename: (req, file, cb) => {
@@ -22,18 +22,18 @@ const fileStorage = multer.diskStorage({
     }
 });
 const fileFilter = (req, file, cb) => {
-    console.log(file)
-    if(file.fieldname === "metadataFile"){
-        if (file.mimetype === 'text/csv' || path.extname(file.originalname) === ".csv" ){
+    // console.log(file)
+    if (file.fieldname === "metadataFile") {
+        if (file.mimetype === 'text/csv' || path.extname(file.originalname) === ".csv") {
             cb(null, true)
-        } else{
+        } else {
             cb(null, false)
         }
     } else {
-        if (file.mimetype === 'application/zip'){
+        if (file.mimetype === 'application/zip' || path.extname(file.originalname) === ".zip") {
             //console.log("hello world zip")
             cb(null, true)
-        } else{
+        } else {
             cb(null, false)
         }
     }
@@ -44,7 +44,7 @@ const fileFilter = (req, file, cb) => {
 // YALIN MULTER
 // const fileStorage = multer.diskStorage({
 //     destination: (req, file, cb) => {
-        
+
 //         cb(null, "data-files")
 //     },
 //     filename: (req, file, cb) => {
@@ -83,10 +83,19 @@ const metaDataController = require("../controllers/metadata");
 //router.get("/list-files", frontendControllers.getResearches);
 router.get("/", frontendControllers.getHomePage)
 router.get("/upload-success", submissionController.getUploadSuccess)
-router.post("/submission",  upload.fields([{name: "rawFile", maxCount: 1},
-{name: "metadataFile", maxCount:1}]), submissionController.uploadSubmission);
+router.post("/submission", upload.fields([{
+        name: "rawFile",
+        maxCount: 1
+    },
+    {
+        name: "metadataFile",
+        maxCount: 1
+    }
+]), submissionController.uploadSubmission);
 router.get("/submission", submissionController.uploadSubmission);
 router.get("/list-files", submissionController.getListSubmission);
+router.get("/search", submissionController.searchView);
+router.post("/search", submissionController.getListSubmission);
 //router.get("/metadata-files", metaDataController.getListOfMetaDataFile);
 
 

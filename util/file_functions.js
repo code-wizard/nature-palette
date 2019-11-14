@@ -6,6 +6,10 @@ const RawFile = require("../models/rawfile");
 const MetaData = require("../models/metadata")
 const emails = require("./emails")
 // const processRawFiles = require("../util/agenda")
+const rOperation = require("r-script");
+
+// const rScriptPath = './util/calcMetrics.R';
+const rScriptPath = './util/deneme.R';
 
 const readRows = (filepath, option) => {
     // filepath = "data-files/2019-11-06T15:31:22.845Z-2019.09.19 Example of Metadata file limited Darwin core terms.csv"
@@ -40,8 +44,8 @@ const unzipRawFiles = (submission, filepath, errorrMessage, metadata, fileNames)
         fs.mkdir('data-files/raw-files-output/' + validFilesNames[0].submissionId, { recursive: true }, (err) => {
             //throws error if unable to create director
             if (err) throw err;
-            
-            
+
+
             for (const  [index, [, entry]] of Object.entries(Object.entries(zip.entries()))) {
                 // console.log(index, entry)
                 // const desc = entry.isDirectory ? 'directory' : `${entry.size} bytes`;
@@ -68,7 +72,7 @@ const unzipRawFiles = (submission, filepath, errorrMessage, metadata, fileNames)
                         errorrMessage.push({message: filename+ " was not released. No matching metadata row"})
                         // remove the meta data without a matching file
                         metadata[i]["valid"] = false
-                        console.log("No way!")
+                        // console.log("No way!")
                         continue
                     }
                     
@@ -98,9 +102,9 @@ const unzipRawFiles = (submission, filepath, errorrMessage, metadata, fileNames)
             }
 
           });
-        
+
     });
-    
+
 }
 const fieldData = ()=> {
     return ["FileName","UniqueID","genus","specificEpithet","Patch","LightAngle1","LightAngle2","ProbeAngle1","ProbeAngle2","Replicate"]
@@ -127,3 +131,28 @@ module.exports = {
 
 // Mandatory Fields:
 // ["FileName","UniqueID","genus","specificEpithet","Patch","LightAngle1","LightAngle2","ProbeAngle1","ProbeAngle2","Replicate"]
+
+
+function rScriptTrigger(rawFilePath) {
+
+    new Promise((resolve, reject) => {
+        rOperation(rScriptPath)
+            .data({
+                rawFilePath : rawFilePath
+            })
+            .call(function (err, d) {
+                if (err) throw err;
+                resolve(d)
+            })
+    }).then(function (value) {
+
+        // prints out result of R script - value
+        console.log(value);
+
+        // TODO : will check metrics, if yes then make submission flag TRUE then inform user
+    })
+    .catch(err => {
+        // send email to user that there is a problem
+        console.log(err)
+    });
+}

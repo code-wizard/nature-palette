@@ -1,7 +1,7 @@
 # node_modules
-data-files
+# data-files
 # node_modules
-#data-files
+data-files
 util/database.js
 .DS_Store
-config.json
+npws.code-workspace

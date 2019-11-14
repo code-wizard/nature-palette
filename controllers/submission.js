@@ -1,6 +1,7 @@
 // const csv = require('csv-parser');
 // const fs = require('fs');
 const submissionModel = require("../models/submission");
+const metaDataModel = require("../models/metadata");
 // const metaDataController = require("../controllers/metadata");
 const fileFuncs = require("../util/file_functions")
 const path = require("path");
@@ -12,7 +13,7 @@ const processRawFiles = require("../util/agenda")
 
 module.exports.uploadSubmission = (req, res) => {
 
-    if(req.method === "POST"){
+    if (req.method === "POST") {
         const body = req.body;
 
         submission = new submissionModel();
@@ -34,6 +35,8 @@ module.exports.uploadSubmission = (req, res) => {
         const rm = []
         const hm = []
         data = []
+        // console.log(metadataFile)
+
         if (!metadataFile || !rawFile) {
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
@@ -41,41 +44,35 @@ module.exports.uploadSubmission = (req, res) => {
                 success: false,
                 errorMessage: "Attach only .csv or .zip file"
             });
-        } 
-        else if (parseInt(submission.embargo) && !submission.releaseDate) {
+        } else if (parseInt(submission.embargo) && !submission.releaseDate) {
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
                 errorMessage: "Please specify embargo expiry date"
             });
-        }
-        else if(submission.releaseDate && dateFn.getYear(new Date(submission.releaseDate)) < dateFn.getYear(new Date())){
+        } else if (submission.releaseDate && dateFn.getYear(new Date(submission.releaseDate)) < dateFn.getYear(new Date())) {
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
                 errorMessage: "Embargo release date must be in the future."
             });
-        }
-        
-        else if(submission.releaseDate && dateFn.differenceInYears(new Date(), new Date(submission.releaseDate))>1) {
+        } else if (submission.releaseDate && dateFn.differenceInYears(new Date(), new Date(submission.releaseDate)) > 1) {
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
                 errorMessage: "Embargo release date must not be greater then 1 year from today."
             });
-        }
-        else if(submission.published === "yes" && !submission.doi){
+        } else if (submission.published === "yes" && !submission.doi) {
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
                 errorMessage: "Digital Object Reference is required for a published research."
             });
-        }
-        else if(submission.published === "yes" && !submission.reference){
+        } else if (submission.published === "yes" && !submission.reference) {
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
@@ -83,19 +80,22 @@ module.exports.uploadSubmission = (req, res) => {
                 errorMessage: "Reference is required for a published research."
             });
         }
-        
+
         // create a stream to read the csv
         const stream = fileFuncs.readRows(metadataFile[0].path, {
-            mapHeaders: ({ header, index }) => _.replace(header.toLowerCase(), " ", "")
-          } )
-          // Get the required field
-        if(body.dataFrom === "field")
-          requireField = fileFuncs.fieldData()
+            mapHeaders: ({
+                header,
+                index
+            }) => _.replace(header.toLowerCase(), " ", "")
+        })
+        // Get the required field
+        if (body.dataFrom === "field")
+            requireField = fileFuncs.fieldData()
         else
-          requireField = fileFuncs.museumData()
-        
+            requireField = fileFuncs.museumData()
+
         // Make metadata lower case
-        for (f of requireField){
+        for (f of requireField) {
             rm.push(f.toLocaleLowerCase())
         }
         let index = 0;
@@ -185,17 +185,47 @@ module.exports.uploadSubmission = (req, res) => {
 
 
 exports.getListSubmission = (req, res, next) => {
-    submissionModel.getAll()
+
+    var body = req.body
+
+    searchMetaData = new metaDataModel();
+    searchMetaData.institutionCode = !body.institutionCode.trim() ? undefined : body.institutionCode;
+    searchMetaData.collectionCode = !body.collectionCode.trim() ? undefined : body.collectionCode;
+    searchMetaData.catalogNumber = !body.catalogNumber.trim() ? undefined : body.catalogNumber;
+    searchMetaData.className = !body.className.trim() ? undefined : body.className;
+    searchMetaData.order = !body.order.trim() ? undefined : body.order;
+    searchMetaData.family = !body.family.trim() ? undefined : body.family;
+    searchMetaData.genus = !body.genus.trim() ? undefined : body.genus;
+    searchMetaData.specificEpithet = !body.specificEpithet.trim() ? undefined : body.specificEpithet;
+    searchMetaData.infraspecificEpithet = !body.infraspecificEpithet.trim() ? undefined : body.infraspecificEpithet;
+    searchMetaData.sex = !body.sex.trim() ? undefined : body.sex;
+    searchMetaData.lifeStage = !body.lifeStage.trim() ? undefined : body.lifeStage;
+    searchMetaData.country = body.country = !body.country.trim() ? undefined : body.country;
+    searchMetaData.patch = body.patch = !body.patch.trim() ? undefined : body.patch;
+
+    submissionModel.getByMetaDataFilter(searchMetaData)
         .then(submissionResponse => {
-            res.render('list', {
-                title: "All Research Files",
-                researches: submissionResponse
+
+            res.render('search', {
+                submissionList: submissionResponse['submissionlist'],
+                metadataList: submissionResponse['metadatalist'],
+                listVisible: true
             })
         })
         .catch(err => {
             console.log(err)
         })
 }
+
+exports.searchView = (req, res, next) => {
+
+    res.render('search', {
+        submissionList: undefined,
+        listVisible: false
+    })
+
+}
+
 
 exports.getUploadSuccess = (req, res, next) => {
     res.render("subsuccess")
