@@ -102,11 +102,11 @@ module.exports.uploadSubmission = (req, res) => {
         stream.on('headers', (headers) => {
           
             const intersection = _.intersection(rm, headers)
-            console.log(intersection, "Intersection", rm, headers)
+            // console.log(intersection, "Intersection", rm, headers)
             
             if (intersection.length != requireField.length){
                 missingRFields = _.difference(rm, intersection)
-                console.log(missingRFields)
+                // console.log(missingRFields)
                      return res.status(422).render("submission", {
                             title: "Nature Palette - Upload",
                             hasError: true,
@@ -126,7 +126,7 @@ module.exports.uploadSubmission = (req, res) => {
              })
                 // res.redirect("/upload-success")
             }
-            stream.destroy()
+            // stream.destroy()
             
           })
         .on('data', (row) => {
