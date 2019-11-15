@@ -1,4 +1,5 @@
 const getDb = require("../util/database").getDb;
+var ObjectID = require("mongodb").ObjectID;
 
 module.exports = class MetaData {
 
@@ -89,10 +90,11 @@ module.exports = class MetaData {
         const db = getDb();
         return db.collection('metadata')
             .find({
-                submissionId: submissionId
+                submissionId: ObjectID(submissionId)
             })
             .toArray()
             .then(result => {
+                
                 return result;
             })
             .catch(e => {
@@ -115,4 +117,5 @@ module.exports = class MetaData {
                 throw e;
             })
     }
+
 }

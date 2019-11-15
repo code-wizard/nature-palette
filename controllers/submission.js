@@ -1,14 +1,16 @@
 // const csv = require('csv-parser');
-// const fs = require('fs');
-const submissionModel = require("../models/submission");
-const metaDataModel = require("../models/metadata");
+const fs = require('fs')
+const http = require('http')
+const submissionModel = require('../models/submission')
+const metaDataModel = require('../models/metadata')
+const rawFileModel = require('../models/rawfile')
 // const metaDataController = require("../controllers/metadata");
 const fileFuncs = require("../util/file_functions")
-const path = require("path");
-const Research = require("../models/research");
+const path = require("path")
+const Research = require("../models/research")
 const multer = require("multer")
 const dateFn = require("date-fns")
-const _ = require("lodash");
+const _ = require("lodash")
 const processRawFiles = require("../util/agenda")
 
 module.exports.uploadSubmission = (req, res) => {
@@ -35,7 +37,6 @@ module.exports.uploadSubmission = (req, res) => {
         const rm = []
         const hm = []
         data = []
-        // console.log(metadataFile)
 
         if (!metadataFile || !rawFile) {
             return res.status(422).render("submission", {
@@ -100,49 +101,45 @@ module.exports.uploadSubmission = (req, res) => {
         }
         let index = 0;
         stream.on('headers', (headers) => {
-          
-            const intersection = _.intersection(rm, headers)
-            console.log(intersection, "Intersection", rm, headers)
-            
-            if (intersection.length != requireField.length){
-                missingRFields = _.difference(rm, intersection)
-                console.log(missingRFields)
-                     return res.status(422).render("submission", {
-                            title: "Nature Palette - Upload",
-                            hasError: true,
-                            success: false,
-                            errorMessage: `Your metadata is missing some required fileds ${missingRFields}`
-                        });
-            }
-            else {
-             submission.save()
-             .then( (id)=> {
-                 console.log(id, "Hello world")
-                 processRawFiles.readRawFiles(submission, metadataFile[0].path,rawFile[0].path, id, rm, res)
-                res.redirect("/upload-success")
-             })
-             .catch((err)=>{
-                console.log("unable to save submission",err)
-             })
-                // res.redirect("/upload-success")
-            }
-            stream.destroy()
-            
-          })
-        .on('data', (row) => {
-            // processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
-            //  "data-files/" + rawFile[0].filename, rm)
-            
-            stream.destroy()
-            // console.log(index++, "fdfd", row)
-            // data.push(row);
-            // console.log(row)
-        })
-        .on("end", () => {
-            // console.log(data, "Done")
-            // console.log("ds")
-            // fileFuncs.unzipFile("fdfd")
-        })
+
+                const intersection = _.intersection(rm, headers)
+
+                if (intersection.length != requireField.length) {
+                    missingRFields = _.difference(rm, intersection)
+                    return res.status(422).render("submission", {
+                        title: "Nature Palette - Upload",
+                        hasError: true,
+                        success: false,
+                        errorMessage: `Your metadata is missing some required fileds ${missingRFields}`
+                    });
+                } else {
+                    submission.save()
+                        .then((id) => {
+                            processRawFiles.readRawFiles(submission, metadataFile[0].path, rawFile[0].path, id, rm, res)
+                            res.redirect("/upload-success")
+                        })
+                        .catch((err) => {
+                            console.log("unable to save submission", err)
+                        })
+                    // res.redirect("/upload-success")
+                }
+                stream.destroy()
+
+            })
+            .on('data', (row) => {
+                // processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
+                //  "data-files/" + rawFile[0].filename, rm)
+
+                stream.destroy()
+                // console.log(index++, "fdfd", row)
+                // data.push(row);
+                // console.log(row)
+            })
+            .on("end", () => {
+                // console.log(data, "Done")
+                // console.log("ds")
+                // fileFuncs.unzipFile("fdfd")
+            })
 
         // var insertedSubmissionId;
         // var savePromise = new Promise((resolve, reject) => {
@@ -150,7 +147,7 @@ module.exports.uploadSubmission = (req, res) => {
         // });
         // savePromise.then(function(value){
         //     insertedSubmissionId = value;
-            
+
         //     // reading metadata file
         //     var filePath = submission.metaDataFile.path;
         //     new Promise((resolve, reject) => {
@@ -162,7 +159,7 @@ module.exports.uploadSubmission = (req, res) => {
         //                 resolve(results);
         //             });
         //     }).then(function (value) {
-                
+
         //         // after read, insert meta data file list
         //         var contentOfMetaDataFile = value;
         //         contentOfMetaDataFile.forEach(element => {
@@ -180,9 +177,8 @@ module.exports.uploadSubmission = (req, res) => {
         })
     }
     // kaydet
-    
-}
 
+}
 
 exports.getListSubmission = (req, res, next) => {
 
@@ -226,7 +222,28 @@ exports.searchView = (req, res, next) => {
 
 }
 
-
 exports.getUploadSuccess = (req, res, next) => {
     res.render("subsuccess")
+}
+
+
+exports.downloadSelectedData = (req, res, next) => {
+
+    var submissionIdThatWillBeDownloaded = req.body.submissionId;
+
+    // get meta data list
+    metaDataModel.getListOfMetaDataFileBySubmissionId(submissionIdThatWillBeDownloaded)
+        .then(metadatalist => {
+
+            // with that meta data list, return raw files that matches metadata id
+            rawFileModel.getListOfRawFileByMetaDataIdList(metadatalist)
+                .then(rawfilelist => {
+
+                    var preparingZipPromise = fileFuncs.prepareDownloadZipFile(submissionIdThatWillBeDownloaded, metadatalist, rawfilelist)
+
+                    preparingZipPromise.then(function (value) {
+                        res.download(value)
+                    })
+                })
+        })
 }

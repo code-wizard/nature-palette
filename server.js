@@ -25,6 +25,7 @@ app.use("/admin", adminRoute);
 app.use(fontendData.routes);
 
 app.use(errorController.get404);
+
 mongoConnect(() => {
     agenda.on( "ready", function() {
         agenda.start()

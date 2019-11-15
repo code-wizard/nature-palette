@@ -1,11 +1,10 @@
-const mongo = require("mongodb");
+const mongo = require("mongodb")
+const config = require('../config.js')
 mongoClient = mongo.MongoClient
 let _db;
 
-const stringquery = 'mongodb+srv://cjamaefula:dinma1990@cluster0-ck9mx.mongodb.net/nature-palette?retryWrites=true&w=majority'
-
 const mongoConnect = callback => {
-    mongoClient.connect(stringquery, { 
+    mongoClient.connect(global.gConfig.database, { 
             useUnifiedTopology: true
         })
 
@@ -28,4 +27,3 @@ const getDb = () => {
 }
 exports.mongoConnect = mongoConnect;
 exports.getDb = getDb;
-exports.stringquery = stringquery;

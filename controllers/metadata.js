@@ -50,19 +50,6 @@ exports.uploadMetaData = function (mdata, submissionInfo, rawDataFilePath) {
     });
 }
 
-module.exports.getListOfMetaDataFileBySubmissionId = (req, res, next) => {
-    metaDataModel.getListOfMetaDataFileBySubmissionId(req.submissionId != 0 ? req.submissionId : 0)
-        .then(metaDataResult => {
-            res.render('metadatalist', {
-                title: "Meta Data List",
-                metadatafiles: metaDataResult
-            })
-        })
-        .catch(err => {
-            console.log(err)
-        });
-}
-
 module.exports.getListOfMetaDataFile = (req, res, next) => {
     metaDataModel.getListOfMetaDataFile()
         .then(metaDataResult => {
