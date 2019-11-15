@@ -41,7 +41,8 @@ const unzipRawFiles = (submission, filepath, errorrMessage, metadata, fileNames)
             // return
         }
         const dirName = 'data-files/raw-files-output/' + validFilesNames[0].submissionId
-        fs.mkdir('data-files/raw-files-output/' + validFilesNames[0].submissionId, { recursive: true }, (err) => {
+        // { recursive: true }
+        fs.mkdir('data-files/raw-files-output/' + validFilesNames[0].submissionId, (err) => {
             //throws error if unable to create director
             if (err) throw err;
 
