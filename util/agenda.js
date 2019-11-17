@@ -2,8 +2,10 @@ const fileFuncs = require("./file_functions")
 const Agenda = require("agenda")
 const fs = require("fs")
 const _ = require("lodash")
+var ObjectID = require("mongodb").ObjectID;
+const config = require('../config.js')
 
-const agenda = new Agenda({db: {address: 'mongodb+srv://cjamaefula:dinma1990@cluster0-ck9mx.mongodb.net/nature-palette', collection: 'agendaJobs', options: { useNewUrlParser: true }}});
+const agenda = new Agenda({db: {address: global.gConfig.database, collection: 'agendaJobs', options: { useNewUrlParser: true }}});
 
 readRawFiles = (submission, csvPath, rawFilePath, submissionId, required,  res)=>{
     let index = 0
@@ -29,7 +31,6 @@ readRawFiles = (submission, csvPath, rawFilePath, submissionId, required,  res)=
             
             flag = false
             for (h of required) {
-                // console.log(row[h])
                 if(!row[h])  {
                     errorrMessage.push({message: row[h] + " is missing a value  at row no " + parseInt(index + 1)})
                     console.log("failed", index)
@@ -44,19 +45,17 @@ readRawFiles = (submission, csvPath, rawFilePath, submissionId, required,  res)=
                 fileNames.push(row["filename"])
             }
             row["submissionId"] = submissionId;
-            row["_id"] = index +"-"+submissionId + Date.now() + row.filename 
-            console.log(row["_id"], row.filename )
+            row["_id"] = new ObjectID();
                 
             row["flag"] = flag;
             metaData.push(row)
             // }
             index++
-            // console.log(row)
         })
         .on("end", () => {
             // console.log(errorrMessage, "error messages Done")
             // console.log("Done", metaData)
-            console.log("Done", metaData.length, "Out")
+            // console.log("Done", metaData.length, "Out")
             fileFuncs.unzipFile(submission, rawFilePath,errorrMessage, metaData, fileNames)
             
             
