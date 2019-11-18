@@ -51,72 +51,79 @@ const unzipRawFiles = (submission, filepath, errorrMessage, metadata, fileNames)
             //send email to client with error messages
             // return
         }
-        const dirName = 'data-files/raw-files-output/' + validFilesNames[0].submissionId
+        const dirName = 'data-files/raw-files-output/' + validFilesNames[0].submissionId;
     
         // { recursive: true }
-        fs.mkdir('data-files/raw-files-output/' + validFilesNames[0].submissionId, (err) => {
-            //throws error if unable to create director
-            if (err) throw err;
+        // if(!fs.exists('data-files/raw-files-output/')){
+            fs.mkdir('data-files/raw-files-output/' + validFilesNames[0].submissionId, (err) => {
+                //throws error if unable to create director
+                if (err) {
+                    console.log(err.code, "hellow world")
+                    if (err.code == 'EEXIST') cb(null); 
+                    else throw err;
+                }
 
 
-            for (const [index, [, entry]] of Object.entries(Object.entries(zip.entries()))) {
-                // console.log(index, entry)
-                // const desc = entry.isDirectory ? 'directory' : `${entry.size} bytes`;
-                if (!entry.isDirectory) {
-                    i++
-                    let filename = _.replace(entry.name, zipdirName, "")
-                    if (entry.name.includes(fileNames[i])) {
-                        // console.log("File exists", i, entry.name,dirName,"fdfdfd", _.replace(entry.name, dirName, ""))
+                for (const [index, [, entry]] of Object.entries(Object.entries(zip.entries()))) {
+                    // console.log(index, entry)
+                    // const desc = entry.isDirectory ? 'directory' : `${entry.size} bytes`;
+                    if (!entry.isDirectory) {
+                        i++
+                        let filename = _.replace(entry.name, zipdirName, "")
+                        if (entry.name.includes(fileNames[i])) {
+                            // console.log("File exists", i, entry.name,dirName,"fdfdfd", _.replace(entry.name, dirName, ""))
 
-                        // console.log(dirName, "Meta data")
-                        let dirPath = dirName + "/" + filename;
-                        metadata[i]["valid"] = true
-                        rawFiles.push({
-                            metaDataId: metadata[i]._id,
-                            path: dirPath,
-                            type: '',
-                            fileName: filename
-                        })
-                        zip.extract(entry.name, dirPath, err => {
-                            // console.log(entry.name, "Nand", dirPath, "Couldn't")
-                            // errorrMessage.push({message:  " Could not read "+filename})
-                        })
+                            // console.log(dirName, "Meta data")
+                            let dirPath = dirName + "/" + filename;
+                            metadata[i]["valid"] = true
+                            rawFiles.push({
+                                metaDataId: metadata[i]._id,
+                                path: dirPath,
+                                type: '',
+                                fileName: filename
+                            })
+                            zip.extract(entry.name, dirPath, err => {
+                                // console.log(entry.name, "Nand", dirPath, "Couldn't")
+                                // errorrMessage.push({message:  " Could not read "+filename})
+                            })
+                        } else {
+                            errorrMessage.push({
+                                message: filename + " was not released. No matching metadata row"
+                            })
+                            // remove the meta data without a matching file
+                            metadata[i]["valid"] = false
+                            // console.log("No way!")
+                            continue
+                        }
+
                     } else {
-                        errorrMessage.push({
-                            message: filename + " was not released. No matching metadata row"
-                        })
-                        // remove the meta data without a matching file
-                        metadata[i]["valid"] = false
-                        // console.log("No way!")
-                        continue
+                        zipdirName = entry.name
+                        i = index - 1
                     }
-                    
-                } else {
-                    zipdirName = entry.name
-                    i = index - 1
+                    // console.log(`Entry ${entry.name}: ${desc}`);
                 }
-                // console.log(`Entry ${entry.name}: ${desc}`);
-            }
-            // console.log(rawFiles, "Here")
-            // Note to self, try moving the saving of metadata and raw to a new background process after the 
-            // Validation is done 
-            try{
-                // MetaData.saveMany(metadata.filter((item)=>{return item.valid}))
-                MetaData.saveMany(metadata)
-                console.log("done saving")
-                RawFile.saveMany(rawFiles)
-                console.log("Saving Rawfiles done")
-                let message = emails.successMesg(submission);
-                if (errorrMessage.length) {
-                    message = emails.prepareErrorMessageHTML(errorrMessage, submission)
+                // console.log(rawFiles, "Here")
+                // Note to self, try moving the saving of metadata and raw to a new background process after the
+                // Validation is done
+                try{
+                    // MetaData.saveMany(metadata.filter((item)=>{return item.valid}))
+                    MetaData.saveMany(metadata)
+                    console.log("done saving")
+                    RawFile.saveMany(rawFiles)
+                    console.log("Saving Rawfiles done")
+                    let message = emails.successMesg(submission);
+                    if (errorrMessage.length) {
+                        message = emails.prepareErrorMessageHTML(errorrMessage, submission)
+                    }
+                    emails.sendEmail(submission.email, message)
+                    // Send email to client with list of errors
+                } catch (err) {
+                    console.log("error saving metadata", err)
                 }
-                emails.sendEmail(submission.email, message)
-                // Send email to client with list of errors
-            } catch (err) {
-                console.log("error saving metadata", err)
-            }
 
-        });
+            });
+        // }
+
     })
 }
 
