@@ -79,9 +79,47 @@ module.exports = class Submission {
 
         var newquery = {}
 
-        Object.keys(metaDataInfo).forEach(function (attrname) {
-            if (metaDataInfo[attrname] != undefined) {
+        // added temporary search keyword until index
+        if(metaDataInfo['searchKeyword'] != undefined){
 
+            newquery['$or'] = []
+            var keywordstr = metaDataInfo['searchKeyword']
+
+            Object.keys(metaDataInfo).forEach(function (attrname){
+                if (attrname != 'searchKeyword') {
+
+                    var obj = {}
+                    obj[attrname.toLowerCase()] = {}
+
+                    _.split(keywordstr.replace(/\s/g, ''), ',').forEach(element => {
+                        if (element.startsWith('-')) {
+                            obj[attrname.toLowerCase()]['$not'] = {}
+                            obj[attrname.toLowerCase()]['$not']['$in'] = []
+                        }
+                        else{
+                            obj[attrname.toLowerCase()]['$in'] = []
+                        }
+                    })
+
+                    _.split(keywordstr.replace(/\s/g, ''), ',').forEach(element => {
+                        if (element.startsWith('-')) {
+                            obj[attrname.toLowerCase()]['$not']['$in'].push(element.replace('-',''))
+                        } else {
+                            obj[attrname.toLowerCase()]['$in'].push(element)
+                        }
+                    })
+
+                    newquery['$or'].push(obj)
+
+                }
+            })
+
+            
+        }
+
+        Object.keys(metaDataInfo).forEach(function (attrname) {
+            if (metaDataInfo[attrname] != undefined & attrname != 'searchKeyword') {
+                
                 // creates attribute name object for query
                 newquery[attrname.toLowerCase()] = {}
 
@@ -116,8 +154,6 @@ module.exports = class Submission {
             }
         });
 
-        // console.log('mq: ', metadataquery)
-        // console.log('yq: ', yeniquery)
 
         const db = getDb();
         var getSubmissionIds = new Promise((resolve, reject) => {
