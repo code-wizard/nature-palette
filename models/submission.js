@@ -77,21 +77,53 @@ module.exports = class Submission {
         var submissionquery = {};
         submissionquery["$in"] = [];
 
+        var newquery = {}
+
         Object.keys(metaDataInfo).forEach(function (attrname) {
             if (metaDataInfo[attrname] != undefined) {
-                metadataquery["$and"].push({
-                    [attrname.toLowerCase()]: metaDataInfo[attrname]
-                });
+
+                // creates attribute name object for query
+                newquery[attrname.toLowerCase()] = {}
+
+                // incoming search string for attribute
+                var incominstr = metaDataInfo[attrname]
+
+                // yalin 
+                // replaces space ' ' with empty '' then if the search string contains minus (-) it creates 'not in' array
+                // else it creates 'in' array
+                // no need to delete because if string doesnt have minus no need to add array
+                // if we add next foreach above we can overwrite array so..
+                _.split(incominstr.replace(/\s/g, ''), ',').forEach(element => {
+                    if (element.startsWith('-')) {
+                        newquery[attrname.toLowerCase()]['$not'] = {}
+                        newquery[attrname.toLowerCase()]['$not']['$in'] = []
+                    }
+                    else{
+                        newquery[attrname.toLowerCase()]['$in'] = []
+                    }
+                })
+                
+                // again it checks incoming string if it has minus adds to not in query
+                // else adds to in query for specific attribute 
+                _.split(incominstr.replace(/\s/g, ''), ',').forEach(element => {
+                    if (element.startsWith('-')) {
+                        newquery[attrname.toLowerCase()]['$not']['$in'].push(element.replace('-',''))
+                    } else {
+                        newquery[attrname.toLowerCase()]['$in'].push(element)
+                    }
+                })
+
             }
         });
+
+        // console.log('mq: ', metadataquery)
+        // console.log('yq: ', yeniquery)
 
         const db = getDb();
         var getSubmissionIds = new Promise((resolve, reject) => {
             db.collection("metadata")
                 .find(
-                    (metadataquery = metadataquery["$and"].length ?
-                        metadataquery :
-                        Array.empty)
+                    newquery
                 )
                 .toArray()
                 .then(result => {
