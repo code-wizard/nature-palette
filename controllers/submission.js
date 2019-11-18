@@ -185,7 +185,7 @@ module.exports.uploadSubmission = (req, res) => {
 exports.getListSubmission = (req, res, next) => {
 
     var body = req.body
-
+    console.log(body)
     searchMetaData = new metaDataModel();
     searchMetaData.searchKeyword = !body.searchKeyword.trim() ? undefined : body.searchKeyword;
     searchMetaData.institutionCode = !body.institutionCode.trim() ? undefined : body.institutionCode;
