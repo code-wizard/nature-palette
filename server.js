@@ -15,7 +15,7 @@ const agenda = require("./util/agenda").agenda
 
 
 
-process.env.NODE_ENV = 'development';
+process.env.NODE_ENV = 'production';
 const config = require('./config.js');
 
 app.use(bodyParser.urlencoded({ extended: false }));
