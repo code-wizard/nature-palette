@@ -124,14 +124,14 @@ module.exports.uploadSubmission = (req, res) => {
                         })
                     // res.redirect("/upload-success")
                 }
-                stream.destroy()
+                // stream.destroy()
 
             })
             .on('data', (row) => {
                 // processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
                 //  "data-files/" + rawFile[0].filename, rm)
 
-                stream.destroy()
+                // stream.destroy()
                 // console.log(index++, "fdfd", row)
                 // data.push(row);
                 // console.log(row)
