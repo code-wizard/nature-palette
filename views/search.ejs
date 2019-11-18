@@ -88,14 +88,14 @@
         <form action="search" method="POST">
 
             <div class="row">
-                <div class="col-lg-9">
-                    <input class="form-control" name="search" type="text" placeholder="Enter keywords">
+                <div class="col">
+                    <input class="form-control" name="search" type="text" placeholder="Keywords..">
                 </div>
                 <div class="col-lg-3">
                         <a href="#demo2" class="" data-toggle="collapse">Advance Search</a>
                         <button type="submit" class="btn btn-primary">Submit</button>
-                        
-    
+
+
                     </div>
             </div>
 
@@ -201,7 +201,7 @@
                     <a href="#" class="btn btn-primary btn-sm mb-3">Color Space</a>
                     <div class="pull-right">
                         <span><%= metadataList.length %> Results found </span>
-                            <button id="showDownloadModal" 
+                            <button id="showDownloadModal"
                             class="btn btn-success" data-submission-count="<%= submissionList.length %>">
                                     Download All <i class="fa fa-download" aria-hidden="true"></i></button>
                     </div>
@@ -251,7 +251,7 @@
                                 </form>
                             </td>
                         </tr>
-                        <tr id="<%= 'yalin' + submission._id %>" class="collapse">
+                        <tr id="<%= 'yalin' + submission._id %>" class="collapse show">
                             <td colspan="9">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-sm">
@@ -338,7 +338,7 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
 
-    
+
     <script>
        $(".metadata-detail td").on("click", (e)=>{
            location.href = "search-detail?id="+ $(e.target).data("id")

@@ -31,7 +31,8 @@ module.exports = class MetaData {
         probeAngle1,
         probeAngle2,
         replicate,
-        comments) {
+        comments,
+        searchKeyword) {
 
         this.fileName = fileName;
         this.submissionId = submissionId;
@@ -62,6 +63,7 @@ module.exports = class MetaData {
         this.probeAngle2 = probeAngle2;
         this.replicate = replicate;
         this.comments = comments;
+        this.searchKeyword = searchKeyword;
     }
     static saveMany(list){
         const db = getDb()

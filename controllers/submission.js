@@ -187,6 +187,7 @@ exports.getListSubmission = (req, res, next) => {
     var body = req.body
 
     searchMetaData = new metaDataModel();
+    searchMetaData.searchKeyword = !body.searchKeyword.trim() ? undefined : body.searchKeyword;
     searchMetaData.institutionCode = !body.institutionCode.trim() ? undefined : body.institutionCode;
     searchMetaData.collectionCode = !body.collectionCode.trim() ? undefined : body.collectionCode;
     searchMetaData.catalogNumber = !body.catalogNumber.trim() ? undefined : body.catalogNumber;
