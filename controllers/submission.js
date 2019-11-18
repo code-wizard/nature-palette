@@ -207,7 +207,7 @@ exports.getListSubmission = (req, res, next) => {
             res.render('search', {
                 submissionList: submissionResponse['submissionlist'],
                 metadataList: submissionResponse['metadatalist'],
-                listVisible: true
+                listVisible: true,
             })
         })
         .catch(err => {
@@ -223,13 +223,23 @@ exports.searchView = (req, res, next) => {
     })
 
 }
-
+exports.searchDetail = (req, res, next) => {
+    metaDataModel.getMetaDataById(req.query.id)
+    .then((metadata)=>{
+        exclusionList = ["flag", "_id", "valid", "submissionId"]
+        console.log(metadata)
+        res.render("search-detail", {metadata: metadata, exclusionList:exclusionList})
+    })
+    
+}
 
 exports.getUploadSuccess = (req, res, next) => {
     res.render("subsuccess")
 }
 
-
+exports.downloadAll = (req, res, next) => {
+    res.status(200).send("Success")
+}
 exports.downloadSelectedData = (req, res, next) => {
 
     var submissionIdThatWillBeDownloaded = req.body.submissionId;
@@ -245,6 +255,7 @@ exports.downloadSelectedData = (req, res, next) => {
                     var preparingZipPromise = fileFuncs.prepareDownloadZipFile(submissionIdThatWillBeDownloaded, metadatalist, rawfilelist)
 
                     preparingZipPromise.then(function (value) {
+                        console.log(value)
                         res.download(value)
                     })
                 })

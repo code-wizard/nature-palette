@@ -15,7 +15,7 @@ const agenda = require("./util/agenda").agenda
 
 
 
-process.env.NODE_ENV = 'production';
+process.env.NODE_ENV = 'development';
 const config = require('./config.js');
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -27,10 +27,11 @@ app.use(fontendData.routes);
 app.use(errorController.get404);
 
 mongoConnect(() => {
+    app.listen(global.gConfig.node_port)
     agenda.on( "ready", function() {
         agenda.start()
         console.log("Agenda Connected")
-        app.listen(global.gConfig.node_port)
+        
       })
     
 })
