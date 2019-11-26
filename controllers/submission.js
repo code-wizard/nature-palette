@@ -37,6 +37,7 @@ module.exports.uploadSubmission = (req, res) => {
         const rm = []
         const hm = []
         data = []
+        // console.log(metadataFile)
 
         if (!metadataFile || !rawFile) {
             return res.status(422).render("submission", {
@@ -123,14 +124,14 @@ module.exports.uploadSubmission = (req, res) => {
                         })
                     // res.redirect("/upload-success")
                 }
-                stream.destroy()
+                // stream.destroy()
 
             })
             .on('data', (row) => {
                 // processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
                 //  "data-files/" + rawFile[0].filename, rm)
 
-                stream.destroy()
+                // stream.destroy()
                 // console.log(index++, "fdfd", row)
                 // data.push(row);
                 // console.log(row)
@@ -147,7 +148,7 @@ module.exports.uploadSubmission = (req, res) => {
         // });
         // savePromise.then(function(value){
         //     insertedSubmissionId = value;
-
+            
         //     // reading metadata file
         //     var filePath = submission.metaDataFile.path;
         //     new Promise((resolve, reject) => {
@@ -159,7 +160,7 @@ module.exports.uploadSubmission = (req, res) => {
         //                 resolve(results);
         //             });
         //     }).then(function (value) {
-
+                
         //         // after read, insert meta data file list
         //         var contentOfMetaDataFile = value;
         //         contentOfMetaDataFile.forEach(element => {
@@ -177,13 +178,14 @@ module.exports.uploadSubmission = (req, res) => {
         })
     }
     // kaydet
-
+    
 }
+
 
 exports.getListSubmission = (req, res, next) => {
 
     var body = req.body
-
+    console.log(body)
     searchMetaData = new metaDataModel();
     searchMetaData.searchKeyword = !body.searchKeyword.trim() ? undefined : body.searchKeyword;
     searchMetaData.institutionCode = !body.institutionCode.trim() ? undefined : body.institutionCode;
@@ -206,7 +208,7 @@ exports.getListSubmission = (req, res, next) => {
             res.render('search', {
                 submissionList: submissionResponse['submissionlist'],
                 metadataList: submissionResponse['metadatalist'],
-                listVisible: true
+                listVisible: true,
             })
         })
         .catch(err => {
@@ -222,12 +224,22 @@ exports.searchView = (req, res, next) => {
     })
 
 }
+exports.searchDetail = (req, res, next) => {
+    metaDataModel.getMetaDataById(req.query.id)
+    .then((metadata)=>{
+        exclusionList = ["flag", "_id", "valid", "submissionId"]
+        console.log(metadata)
+        res.render("search-detail", {metadata: metadata, exclusionList:exclusionList})
+    })
+}
 
 exports.getUploadSuccess = (req, res, next) => {
     res.render("subsuccess")
 }
 
-
+exports.downloadAll = (req, res, next) => {
+    res.status(200).send("Success")
+}
 exports.downloadSelectedData = (req, res, next) => {
 
     var submissionIdThatWillBeDownloaded = req.body.submissionId;
@@ -243,6 +255,7 @@ exports.downloadSelectedData = (req, res, next) => {
                     var preparingZipPromise = fileFuncs.prepareDownloadZipFile(submissionIdThatWillBeDownloaded, metadatalist, rawfilelist)
 
                     preparingZipPromise.then(function (value) {
+                        console.log(value)
                         res.download(value)
                     })
                 })

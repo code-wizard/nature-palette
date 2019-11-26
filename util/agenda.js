@@ -63,7 +63,10 @@ readRawFiles = (submission, csvPath, rawFilePath, submissionId, required,  res)=
         // fileFuncs.unzipFile(rawFilePath, metaData.length, fileNames)
     })
     // console.log(agenda)
-    agenda.now('processRawFile', storeFiles)
+    agenda.now('processRawFile', (job)=>{
+        job.disable();
+        // await job.remove()
+    })
 }
 
 storeFiles = () =>{

@@ -104,7 +104,17 @@ module.exports = class MetaData {
                 throw e;
             })
     }
-
+    static getMetaDataById(id) {
+        const db = getDb();
+        return db.collection('metadata').findOne({_id: ObjectID(id)})
+        .then(result=>{
+            console.log(result)
+            return result
+        })
+        .catch(e => {
+            throw e
+        });
+    }
     static getListOfMetaDataFile() {
         const db = getDb();
         return db.collection('metadata')

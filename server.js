@@ -27,10 +27,11 @@ app.use(fontendData.routes);
 app.use(errorController.get404);
 
 mongoConnect(() => {
+    app.listen(global.gConfig.node_port)
     agenda.on( "ready", function() {
         agenda.start()
         console.log("Agenda Connected")
-        app.listen(global.gConfig.node_port)
+        
       })
     
 })
