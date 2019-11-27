@@ -40,6 +40,7 @@ module.exports = class Submission {
     save() {
         const db = getDb();
         this.recordDate = new Date(Date.now());
+        this.statusValid = false;
         return db
             .collection("submission")
             .insertOne(this)
@@ -67,6 +68,24 @@ module.exports = class Submission {
             });
     }
 
+    static updateStatusValidById(submissionId) {
+        const db = getDb();
+        var myquery = {
+            _id: submissionId
+        };
+        var newvalues = {
+            $set: {
+                statusValid: true
+            }
+        };
+        return db
+            .collection("submission")
+            .updateOne(myquery, newvalues, function (err, res) {
+                if (err) throw err;
+                console.log("submission updated");
+            })
+    }
+
     static getByMetaDataFilter(metaDataInfo) {
 
         var response = [];
@@ -80,12 +99,12 @@ module.exports = class Submission {
         var newquery = {}
 
         // added temporary search keyword until index
-        if(metaDataInfo['searchKeyword'] != undefined){
+        if (metaDataInfo['searchKeyword'] != undefined) {
 
             newquery['$or'] = []
             var keywordstr = metaDataInfo['searchKeyword']
 
-            Object.keys(metaDataInfo).forEach(function (attrname){
+            Object.keys(metaDataInfo).forEach(function (attrname) {
                 if (attrname != 'searchKeyword') {
 
                     var obj = {}
@@ -95,15 +114,14 @@ module.exports = class Submission {
                         if (element.startsWith('-')) {
                             obj[attrname.toLowerCase()]['$not'] = {}
                             obj[attrname.toLowerCase()]['$not']['$in'] = []
-                        }
-                        else{
+                        } else {
                             obj[attrname.toLowerCase()]['$in'] = []
                         }
                     })
 
                     _.split(keywordstr.replace(/\s/g, ''), ',').forEach(element => {
                         if (element.startsWith('-')) {
-                            obj[attrname.toLowerCase()]['$not']['$in'].push(element.replace('-',''))
+                            obj[attrname.toLowerCase()]['$not']['$in'].push(element.replace('-', ''))
                         } else {
                             obj[attrname.toLowerCase()]['$in'].push(element)
                         }
@@ -114,12 +132,12 @@ module.exports = class Submission {
                 }
             })
 
-            
+
         }
 
         Object.keys(metaDataInfo).forEach(function (attrname) {
             if (metaDataInfo[attrname] != undefined & attrname != 'searchKeyword') {
-                
+
                 // creates attribute name object for query
                 newquery[attrname.toLowerCase()] = {}
 
@@ -135,17 +153,16 @@ module.exports = class Submission {
                     if (element.startsWith('-')) {
                         newquery[attrname.toLowerCase()]['$not'] = {}
                         newquery[attrname.toLowerCase()]['$not']['$in'] = []
-                    }
-                    else{
+                    } else {
                         newquery[attrname.toLowerCase()]['$in'] = []
                     }
                 })
-                
+
                 // again it checks incoming string if it has minus adds to not in query
                 // else adds to in query for specific attribute 
                 _.split(incominstr.replace(/\s/g, ''), ',').forEach(element => {
                     if (element.startsWith('-')) {
-                        newquery[attrname.toLowerCase()]['$not']['$in'].push(element.replace('-',''))
+                        newquery[attrname.toLowerCase()]['$not']['$in'].push(element.replace('-', ''))
                     } else {
                         newquery[attrname.toLowerCase()]['$in'].push(element)
                     }

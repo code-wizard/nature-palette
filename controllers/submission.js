@@ -12,6 +12,7 @@ const multer = require("multer")
 const dateFn = require("date-fns")
 const _ = require("lodash")
 const processRawFiles = require("../util/agenda")
+var ObjectID = require("mongodb").ObjectID
 
 module.exports.uploadSubmission = (req, res) => {
 
@@ -19,6 +20,7 @@ module.exports.uploadSubmission = (req, res) => {
         const body = req.body;
 
         submission = new submissionModel();
+        submission._id = new ObjectID();
         submission.firstName = body.firstName;
         submission.lastName = body.lastName;
         submission.description = body.description;
@@ -37,7 +39,6 @@ module.exports.uploadSubmission = (req, res) => {
         const rm = []
         const hm = []
         data = []
-        // console.log(metadataFile)
 
         if (!metadataFile || !rawFile) {
             return res.status(422).render("submission", {
@@ -90,6 +91,7 @@ module.exports.uploadSubmission = (req, res) => {
                 index
             }) => _.replace(header.toLowerCase(), " ", "")
         })
+
         // Get the required field
         if (body.dataFrom === "field")
             requireField = fileFuncs.fieldData()
@@ -100,76 +102,74 @@ module.exports.uploadSubmission = (req, res) => {
         for (f of requireField) {
             rm.push(f.toLocaleLowerCase())
         }
+
         let index = 0;
+        var errorMessage = []
+        var fileNames = []
+        var metaData = []
+
+        var isColumnsMatch = true
+        var isCellValueMissing = true
+
         stream.on('headers', (headers) => {
 
+                // validate column names
                 const intersection = _.intersection(rm, headers)
 
                 if (intersection.length != requireField.length) {
+                    isColumnsMatch = false
                     missingRFields = _.difference(rm, intersection)
-                    return res.status(422).render("submission", {
-                        title: "Nature Palette - Upload",
-                        hasError: true,
-                        success: false,
-                        errorMessage: `Your metadata is missing some required fileds ${missingRFields}`
-                    });
-                } else {
+                    errorMessage.push({
+                        message: 'Your metadata is missing some required fileds : ' + missingRFields.join()
+                    })
+                }
+            })
+            .on('data', (row) => {
+
+                if (isColumnsMatch) {
+                    // validate if required fields has value in cells
+                    for (attr of requireField) {
+                        if (!row[attr.toLowerCase()]) {
+                            isCellValueMissing = false
+                            errorMessage.push({
+                                message: attr.toString() + " is missing a value  at row no " + parseInt(index + 2)
+                            })
+                        }
+                    }
+
+                    // filenames added to check with zip raw files
+                    fileNames.push(row["filename"])
+
+                    row["submissionId"] = submission._id;
+                    row["_id"] = new ObjectID();
+                    // metadata model added for list
+                    metadataModel = convertMetadataLowerToCamelCase(row)
+                    metaData.push(metadataModel)
+
+                    index++
+                }
+            })
+            .on("end", () => {
+                // if there is no mistake on column names, run in background
+                if (isColumnsMatch && isCellValueMissing) {
+
                     submission.save()
-                        .then((id) => {
-                            processRawFiles.readRawFiles(submission, metadataFile[0].path, rawFile[0].path, id, rm, res)
+                        .then((submissionId) => {
+                            processRawFiles.readRawFiles(submission, metadataFile[0].path, rawFile[0].path, metaData, fileNames)
                             res.redirect("/upload-success")
                         })
                         .catch((err) => {
                             console.log("unable to save submission", err)
                         })
-                    // res.redirect("/upload-success")
+                } else {
+                    return res.status(422).render("submission", {
+                        title: "Nature Palette - Upload",
+                        hasError: true,
+                        success: false,
+                        errorMessage: errorMessage
+                    });
                 }
-                // stream.destroy()
-
             })
-            .on('data', (row) => {
-                // processRawFiles.readRawFiles("data-files/" + metadataFile[0].filename,
-                //  "data-files/" + rawFile[0].filename, rm)
-
-                // stream.destroy()
-                // console.log(index++, "fdfd", row)
-                // data.push(row);
-                // console.log(row)
-            })
-            .on("end", () => {
-                // console.log(data, "Done")
-                // console.log("ds")
-                // fileFuncs.unzipFile("fdfd")
-            })
-
-        // var insertedSubmissionId;
-        // var savePromise = new Promise((resolve, reject) => {
-        //     resolve(submission.save());
-        // });
-        // savePromise.then(function(value){
-        //     insertedSubmissionId = value;
-            
-        //     // reading metadata file
-        //     var filePath = submission.metaDataFile.path;
-        //     new Promise((resolve, reject) => {
-        //         var results = [];
-        //         fs.createReadStream(filePath)
-        //             .pipe(csv())
-        //             .on('data', (data) => results.push(data))
-        //             .on('end', () => {
-        //                 resolve(results);
-        //             });
-        //     }).then(function (value) {
-                
-        //         // after read, insert meta data file list
-        //         var contentOfMetaDataFile = value;
-        //         contentOfMetaDataFile.forEach(element => {
-        //             element.submissionId = insertedSubmissionId;
-        //         });
-        //         metaDataController.uploadMetaData(contentOfMetaDataFile);
-        //     })
-        // });
-        // }
     } else {
         res.render('submission', {
             title: "Submit Research",
@@ -178,14 +178,14 @@ module.exports.uploadSubmission = (req, res) => {
         })
     }
     // kaydet
-    
+
 }
 
 
 exports.getListSubmission = (req, res, next) => {
 
     var body = req.body
-    console.log(body)
+
     searchMetaData = new metaDataModel();
     searchMetaData.searchKeyword = !body.searchKeyword.trim() ? undefined : body.searchKeyword;
     searchMetaData.institutionCode = !body.institutionCode.trim() ? undefined : body.institutionCode;
@@ -195,7 +195,7 @@ exports.getListSubmission = (req, res, next) => {
     searchMetaData.order = !body.order.trim() ? undefined : body.order;
     searchMetaData.family = !body.family.trim() ? undefined : body.family;
     searchMetaData.genus = !body.genus.trim() ? undefined : body.genus;
-    searchMetaData.specificEpithet = !body.specificEpithet.trim() ? undefined : body.specificEpithet;
+    searchMetaData.specificEpithet = !body.specificepithet.trim() ? undefined : body.specificEpithet;
     searchMetaData.infraspecificEpithet = !body.infraspecificEpithet.trim() ? undefined : body.infraspecificEpithet;
     searchMetaData.sex = !body.sex.trim() ? undefined : body.sex;
     searchMetaData.lifeStage = !body.lifeStage.trim() ? undefined : body.lifeStage;
@@ -205,9 +205,18 @@ exports.getListSubmission = (req, res, next) => {
     submissionModel.getByMetaDataFilter(searchMetaData)
         .then(submissionResponse => {
 
+            var converted = []
+            converted['submissionlist'] = submissionResponse['submissionlist']
+            converted['metadatalist'] = []
+
+            var x = submissionResponse['metadatalist']
+            x.forEach(element => {
+                converted['metadatalist'].push(convertMetadataLowerToCamelCase(element))
+            });
+
             res.render('search', {
-                submissionList: submissionResponse['submissionlist'],
-                metadataList: submissionResponse['metadatalist'],
+                submissionList: converted['submissionlist'],
+                metadataList: converted['metadatalist'],
                 listVisible: true,
             })
         })
@@ -215,7 +224,6 @@ exports.getListSubmission = (req, res, next) => {
             console.log(err)
         })
 }
-
 exports.searchView = (req, res, next) => {
 
     res.render('search', {
@@ -226,17 +234,18 @@ exports.searchView = (req, res, next) => {
 }
 exports.searchDetail = (req, res, next) => {
     metaDataModel.getMetaDataById(req.query.id)
-    .then((metadata)=>{
-        exclusionList = ["flag", "_id", "valid", "submissionId"]
-        console.log(metadata)
-        res.render("search-detail", {metadata: metadata, exclusionList:exclusionList})
-    })
+        .then((metadata) => {
+            exclusionList = ["flag", "_id", "valid", "submissionId"]
+            res.render("search-detail", {
+                metadata: metadata,
+                exclusionList: exclusionList
+            })
+        })
 }
 
 exports.getUploadSuccess = (req, res, next) => {
     res.render("subsuccess")
 }
-
 exports.downloadAll = (req, res, next) => {
     res.status(200).send("Success")
 }
@@ -260,4 +269,28 @@ exports.downloadSelectedData = (req, res, next) => {
                     })
                 })
         })
+}
+
+function convertMetadataLowerToCamelCase(lower) {
+
+    var resp = {}
+    var added = false
+
+    upper = new metaDataModel();
+    Object.keys(lower).forEach(function (attrname) {
+        added = false
+        Object.keys(upper).forEach(function (metaattr) {
+            if (metaattr.toLowerCase() == attrname) {
+                resp[metaattr] = lower[attrname]
+                added = true
+            }
+        })
+
+        if (!added) {
+            resp[attrname] = lower[attrname]
+        }
+    })
+
+    return resp
+
 }
