@@ -206,7 +206,8 @@ module.exports = class Submission {
                 .find({
                     _id: (submissionquery = submissionquery["$in"].length ?
                         submissionquery :
-                        Array.empty)
+                        Array.empty),
+                    statusValid : true
                 })
                 .toArray()
                 .then(result => {

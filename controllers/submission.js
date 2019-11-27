@@ -209,11 +209,15 @@ exports.getListSubmission = (req, res, next) => {
             converted['submissionlist'] = submissionResponse['submissionlist']
             converted['metadatalist'] = []
 
-            var x = submissionResponse['metadatalist']
+            var submissionIdList = converted['submissionlist'].map(x=> x._id.toString())
+            
+            var x = submissionResponse['metadatalist'].filter(function(item) {  
+                return submissionIdList.includes(item.submissionId.toString());
+            })
             x.forEach(element => {
                 converted['metadatalist'].push(convertMetadataLowerToCamelCase(element))
             });
-
+            
             res.render('search', {
                 submissionList: converted['submissionlist'],
                 metadataList: converted['metadatalist'],
