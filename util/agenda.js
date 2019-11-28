@@ -47,11 +47,11 @@ readRawFiles = (submission, csvPath, rawFilePath, metaData, fileNames ) => {
 }
 
 storeFiles = () => {
-    filepath = "data-files/2019-11-06T15:31:22.850Z-2019.09.19 Example raw files.zip"
-    fs.createReadStream(filepath)
-        .pipe(unzip.Extract({
-            path: 'data-files/unzip'
-        }));
+    // filepath = "data-files/2019-11-06T15:31:22.850Z-2019.09.19 Example raw files.zip"
+    // fs.createReadStream(filepath)
+    //     .pipe(unzip.Extract({
+    //         path: 'data-files/unzip'
+    //     }));
 }
 
 // agenda.on( "ready", function() {

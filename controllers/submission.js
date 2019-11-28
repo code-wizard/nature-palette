@@ -45,6 +45,7 @@ module.exports.uploadSubmission = (req, res) => {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
+                req: req,
                 errorMessage: "Attach only .csv or .zip file"
             });
         } else if(["Transmittance", "Irradiance"].includes(submission.typeOfData)){
@@ -190,6 +191,7 @@ module.exports.uploadSubmission = (req, res) => {
             title: "Submit Research",
             hasError: false,
             success: false,
+            req: req
         })
     }
     // kaydet
