@@ -34,16 +34,11 @@ module.exports = class RawFile {
             });
     }
 
-    static getListOfRawFileByMetaDataIdList(metaDataList){
-
+    static getListOfRawFileByMetaDataIdList(metadataIdList){
         const db = getDb();
-       
-        var metaDataIdList = _.map(metaDataList, "_id");
-        // console.log('metadatalist:' ,inCondition)
         var inCondition = {};
         inCondition["$in"] = [];
-
-        metaDataIdList.forEach(function (metaDataId) {
+        metadataIdList.forEach(function (metaDataId) {
             inCondition["$in"].push(ObjectID(metaDataId));
         });
        

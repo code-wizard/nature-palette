@@ -115,6 +115,29 @@ module.exports = class MetaData {
             throw e
         });
     }
+
+    static getMetaDataByIdList(metadataIdList) {
+        console.log(metadataIdList)
+        const db = getDb();
+        var inCondition = {};
+        inCondition["$in"] = [];
+        metadataIdList.forEach(function (metaDataId) {
+            inCondition["$in"].push(ObjectID(metaDataId));
+        });
+       
+        return db.collection('metadata')
+        .find({
+            _id: (inCondition = inCondition["$in"].length ? inCondition : -1)
+        })
+        .toArray()
+        .then(result=>{            
+            return result
+        })
+        .catch(e => {
+            throw e
+        });
+    }
+
     static getListOfMetaDataFile() {
         const db = getDb();
         return db.collection('metadata')

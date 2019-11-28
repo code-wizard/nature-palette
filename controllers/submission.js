@@ -212,12 +212,13 @@ exports.getListSubmission = (req, res, next) => {
     searchMetaData.order = !body.order.trim() ? undefined : body.order;
     searchMetaData.family = !body.family.trim() ? undefined : body.family;
     searchMetaData.genus = !body.genus.trim() ? undefined : body.genus;
-    searchMetaData.specificEpithet = !body.specificepithet.trim() ? undefined : body.specificEpithet;
+    searchMetaData.specificEpithet = !body.specificEpithet.trim() ? undefined : body.specificEpithet;
     searchMetaData.infraspecificEpithet = !body.infraspecificEpithet.trim() ? undefined : body.infraspecificEpithet;
     searchMetaData.sex = !body.sex.trim() ? undefined : body.sex;
     searchMetaData.lifeStage = !body.lifeStage.trim() ? undefined : body.lifeStage;
     searchMetaData.country = body.country = !body.country.trim() ? undefined : body.country;
     searchMetaData.patch = body.patch = !body.patch.trim() ? undefined : body.patch;
+   
 
     submissionModel.getByMetaDataFilter(searchMetaData)
         .then(submissionResponse => {
@@ -226,18 +227,25 @@ exports.getListSubmission = (req, res, next) => {
             converted['submissionlist'] = submissionResponse['submissionlist']
             converted['metadatalist'] = []
 
+            var allMetadataList = submissionResponse['metadatalist']
+            var metadataOneReplicate = _.filter(allMetadataList, {replicate: '1'});
             var submissionIdList = converted['submissionlist'].map(x => x._id.toString())
 
-            var x = submissionResponse['metadatalist'].filter(function (item) {
+            var metadataIncludesSubmission = metadataOneReplicate.filter(function (item) {
                 return submissionIdList.includes(item.submissionId.toString());
             })
-            x.forEach(element => {
+
+            
+            metadataIncludesSubmission.forEach(element => {
                 converted['metadatalist'].push(convertMetadataLowerToCamelCase(element))
             });
+
+            var metadataIdListDownload = _.map(allMetadataList, "_id");
 
             res.render('search', {
                 submissionList: converted['submissionlist'],
                 metadataList: converted['metadatalist'],
+                metadataIdList: metadataIdListDownload,
                 listVisible: true,
                 req:req
             })
@@ -276,16 +284,21 @@ exports.downloadAll = (req, res, next) => {
 }
 exports.downloadSelectedData = (req, res, next) => {
 
-    var metaList = JSON.parse(req.body.metadataList);
+    var metaIdList = JSON.parse(req.body.metadataIdList);
 
      // with that meta data list, return raw files that matches metadata id
-    rawFileModel.getListOfRawFileByMetaDataIdList(metaList)
+    rawFileModel.getListOfRawFileByMetaDataIdList(metaIdList)
         .then(rawfilelist => {
-            var preparingZipPromise = fileFuncs.prepareDownloadZipFile(metaList, rawfilelist)
-            preparingZipPromise.then(function (value) {
-                console.log(value)
-                res.download(value)
+            metaDataModel.getMetaDataByIdList(metaIdList)
+            .then(metadataList => {
+                var preparingZipPromise = fileFuncs.prepareDownloadZipFile(metadataList, rawfilelist)
+                preparingZipPromise.then(function (value) {
+                    console.log(value)
+                    res.download(value)
+                })
             })
+
+            
         })
 }
 
@@ -300,6 +313,11 @@ function convertMetadataLowerToCamelCase(lower) {
         Object.keys(upper).forEach(function (metaattr) {
             if (metaattr.toLowerCase() == attrname) {
                 resp[metaattr] = lower[attrname]
+                added = true
+            }
+            else if(attrname == 'class'){
+                // special case for class name
+                resp['className'] = lower[attrname]
                 added = true
             }
         })

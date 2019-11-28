@@ -64,7 +64,7 @@ const unzipRawFiles = (submission, filepath, errorrMessage, metadata, fileNames)
             fs.mkdir('data-files/raw-files-output/' + validFilesNames[0].submissionId, (err) => {
                 //throws error if unable to create director
                 if (err) {
-                    if (err.code == 'EEXIST') cb(null);
+                    if (err.code == 'EEXIST') console.log("exisit")//cb(null);
                     else throw err;
                 } else {
 
@@ -277,6 +277,13 @@ const prepareDownloadZipFile = (metadatalist, rawfilelist, cb) => {
     var csvfilename = now + '-meta-data' + '.csv'
     var zipfilepath = path.join(rootpath, 'data-files', zipfilename)
     var csvfilepath = path.join(rootpath, 'data-files', csvfilename)
+
+    // change necessary column names
+    metadatalist.forEach(element => {
+        delete element._id
+        delete Object.assign(element, {['SubmissionNumber']: element['submissionId'] })['submissionId'];
+    });
+
     const csvFromArrayOfObjects = convertArrayToCSV(metadatalist);
 
     return new Promise(function (resolve, reject) {
