@@ -11,84 +11,56 @@
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous"> -->
     <!-- Bootstrap Date-Picker Plugin -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/> -->
-    <link rel="stylesheet" href="css/smart_wizard.css"/>
-    <link rel="stylesheet" href="css/parsley.css"/>
-    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/smart_wizard.css" />
+    <link rel="stylesheet" href="css/parsley.css" />
+    <link rel="stylesheet" href="css/style.css" />
 
     <style>
-            .jumbotron {
-                padding: 0.5em 0.6em;
-            }
-    
-           
-    
-            form.example input[type=text] {
-                padding: 10px;
-                font-size: 17px;
-                border: 1px solid grey;
-                float: left;
-                width: 80%;
-                background: #f1f1f1;
-            }
-    
-            form.example button {
-                float: left;
-                width: 10%;
-                padding: 10px;
-                background: #2196F3;
-                color: white;
-                font-size: 17px;
-                border: 1px solid grey;
-                border-left: none;
-                cursor: pointer;
-            }
-    
-            form.example button:hover {
-                background: #0b7dda;
-            }
-    
-            form.example::after {
-                content: "";
-                clear: both;
-                display: table;
-            }
-    
-            h2 {
-                color: white;
-            }
-        </style>
+        .jumbotron {
+            padding: 0.5em 0.6em;
+        }
+
+
+
+        form.example input[type=text] {
+            padding: 10px;
+            font-size: 17px;
+            border: 1px solid grey;
+            float: left;
+            width: 80%;
+            background: #f1f1f1;
+        }
+
+        form.example button {
+            float: left;
+            width: 10%;
+            padding: 10px;
+            background: #2196F3;
+            color: white;
+            font-size: 17px;
+            border: 1px solid grey;
+            border-left: none;
+            cursor: pointer;
+        }
+
+        form.example button:hover {
+            background: #0b7dda;
+        }
+
+        form.example::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        h2 {
+            color: white;
+        }
+    </style>
 </head>
 
 <body>
-<header class="main-header">
-    <!-- navbar -->
-    <nav class="navbar navbar-toggleable-md bg-info navbar-inverse">
-        <div class="container">
-            <button class="navbar-toggler" data-toggle="collapse" data-target="#mainNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="row">
-                <div class="col-md-6 mb-6">
-                    <h2>Nature's Palette</h2>
-                </div>
-
-                <div class="col-md-6 mb-6">
-                    <div class="collapse navbar-collapse" id="mainNav">
-                        <div class="navbar-nav">
-                            <a class="nav-item nav-link" href="/">Home</a>
-                            <a class="nav-item nav-link" href="/search">Search</a>
-                            <a class="nav-item nav-link active" href="/submission">Upload</a>
-                            <a class="nav-item nav-link" href="#">Join</a>
-                            <a class="nav-item nav-link" href="#">About</a>
-                            <a class="nav-item nav-link" href="#">Help</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-</header>
-
+    <%- include('partials/header') %>
     <div class="container">
 
         <div class="row" style="margin-top: 150px;">
@@ -141,7 +113,10 @@
                         <div class="sw-container tab-content" style="min-height: 366px;">
                             <% if (hasError) { %>
                             <div class="alert alert-danger" role="alert">
-                                <%= errorMessage %>
+                                    <% for (let errmsg of errorMessage) { %>
+                                        <%= errmsg.message %> </br>
+                                    <% } %>
+
                             </div>
                             <% } %>
                             <% if (success) { %>
@@ -231,6 +206,8 @@
                                                             <span class="text-danger">*</span></label>
                                                         <div class="col-md-8">
                                                             <input type="text" data-parsley-group="step-2"
+                                                                value="<%= req.user.firstName %>"
+                                                                readonly
                                                                 data-parsley-required="true" name="firstName"
                                                                 placeholder="John" class="form-control">
                                                         </div>
@@ -242,25 +219,30 @@
                                                             <span class="text-danger">*</span></label>
                                                         <div class="col-md-8">
                                                             <input type="text" data-parsley-group="step-2"
+                                                                value="<%= req.user.lastName %>"
+                                                                readonly
                                                                 data-parsley-required="true" name="lastName"
                                                                 placeholder="Smith" class="form-control">
                                                         </div>
                                                     </div>
                                                     <!-- end form-group row -->
                                                     <div class="form-group row m-b-10">
-                                                        <label
-                                                            class="col-md-3 text-md-left col-form-label">Email</label>
+                                                        <label class="col-md-3 text-md-left col-form-label">Email<span
+                                                                class="text-danger">*</span></label>
                                                         <div class="col-md-8">
                                                             <input type="text" name="email"
+                                                                value="<%= req.user.email %>"
+                                                                readonly
                                                                 placeholder="you@example.com" class="form-control">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row m-b-10">
                                                         <label class="col-md-3 text-md-left col-form-label">Institution
-                                                            Affiliation <span class="text-danger">*</span></label>
+                                                            Affiliation </label>
                                                         <div class="col-md-8">
                                                             <input type="text" data-parsley-group="step-2"
                                                                 data-parsley-required="true"
+                                                                value="<%= req.body.institutionAffiliation%>"
                                                                 name="institutionAffiliation" placeholder=""
                                                                 class="form-control">
                                                         </div>
@@ -269,7 +251,9 @@
                                                         <label class="col-md-3 text-md-left col-form-label">Type of Data
                                                             <span class="text-danger">*</span></label>
                                                         <div class="col-md-8">
-                                                            <select id="inputState" class="form-control"
+                                                            <select id="inputState"
+                                                            value="<%= req.body.typeOfData %>"
+                                                            class="form-control"
                                                                 name="typeOfData" data-parsley-group="step-2"
                                                                 data-parsley-required="true">
                                                                 <option value="">Choose from list</option>
@@ -286,7 +270,9 @@
                                                         <label class="col-md-3 text-md-left col-form-label">Data from
                                                             <span class="text-danger">*</span></label>
                                                         <div class="col-md-8">
-                                                            <select id="inputState" class="form-control"
+                                                            <select id="inputState"
+                                                            value="<%= req.body.dataFrom %>"
+                                                            class="form-control"
                                                                 data-parsley-group="step-2" data-parsley-required="true"
                                                                 name="dataFrom">
                                                                 <option selected value="">Choose from list</option>
@@ -319,6 +305,7 @@
                                                                 class="col-md-3 text-md-left col-form-label">DOI</label>
                                                             <div class="col-md-8">
                                                                 <input type="text" name="doi"
+                                                                value="<%= req.body.doi%>"
                                                                     placeholder="Digital object identifier"
                                                                     class="form-control">
                                                             </div>
@@ -328,6 +315,7 @@
                                                                 class="col-md-3 text-md-left col-form-label">Reference</label>
                                                             <div class="col-md-8">
                                                                 <input type="text" name="reference"
+                                                                value="<%= req.body.reference%>"
                                                                     placeholder="Reference- Citation of the publication"
                                                                     class="form-control">
                                                             </div>
@@ -352,7 +340,8 @@
                                                         style="display: none">
                                                         <label class="col-md-3 text-md-left col-form-label">Date</label>
                                                         <div class="col-md-8">
-                                                            <input type="date" name="releaseDate" max="3000-12-31"
+                                                            <input type="date" value="<%= req.body.releaseDate%>"
+                                                             name="releaseDate" max="3000-12-31"
                                                                 min="1000-01-01" class="form-control">
                                                         </div>
                                                     </div>

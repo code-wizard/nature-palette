@@ -38,6 +38,8 @@ const prepareErrorMessageHTML = (errors, submission) =>{
 const successMesg = (submission) => {
     return "<div>Hello "+submission.firstName +"</div><div> Your file has been uploaded successfully without any errors </div>";
 }
+
+
 module.exports = {
     sendEmail: sendEmail,
     successMesg: successMesg,

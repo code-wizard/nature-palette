@@ -37,22 +37,22 @@ module.exports = class RawFile {
     static getListOfRawFileByMetaDataIdList(metaDataList){
 
         const db = getDb();
-        // console.log('metadatalist:' ,metaDataList)
+       
         var metaDataIdList = _.map(metaDataList, "_id");
-
+        // console.log('metadatalist:' ,inCondition)
         var inCondition = {};
         inCondition["$in"] = [];
 
         metaDataIdList.forEach(function (metaDataId) {
             inCondition["$in"].push(ObjectID(metaDataId));
         });
-
+       
         // returns rawfile list
         return db
                 .collection('rawfile')
                 .find({
                     // TODO metadata will change with metadataId
-                    metadata: (inCondition = inCondition["$in"].length ? inCondition : -1)
+                    metaDataId: (inCondition = inCondition["$in"].length ? inCondition : -1)
                 })
                 .toArray()
                 .then(result => {

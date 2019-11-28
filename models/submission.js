@@ -1,6 +1,7 @@
 const getDb = require("../util/database").getDb;
 var ObjectID = require("mongodb").ObjectID;
 const _ = require("lodash");
+const MetaDataModel = require('../models/metadata')
 
 module.exports = class Submission {
     constructor(
@@ -40,6 +41,7 @@ module.exports = class Submission {
     save() {
         const db = getDb();
         this.recordDate = new Date(Date.now());
+        this.statusValid = false;
         return db
             .collection("submission")
             .insertOne(this)
@@ -67,6 +69,24 @@ module.exports = class Submission {
             });
     }
 
+    static updateStatusValidById(submissionId) {
+        const db = getDb();
+        var myquery = {
+            _id: submissionId
+        };
+        var newvalues = {
+            $set: {
+                statusValid: true
+            }
+        };
+        return db
+            .collection("submission")
+            .updateOne(myquery, newvalues, function (err, res) {
+                if (err) throw err;
+                console.log("submission updated");
+            })
+    }
+
     static getByMetaDataFilter(metaDataInfo) {
 
         var response = [];
@@ -78,50 +98,64 @@ module.exports = class Submission {
         submissionquery["$in"] = [];
 
         var newquery = {}
+        
+        var query = []
+        var obj = {}
 
-        // added temporary search keyword until index
-        if(metaDataInfo['searchKeyword'] != undefined){
+        if (metaDataInfo['searchKeyword'] != undefined) {
 
             newquery['$or'] = []
-            var keywordstr = metaDataInfo['searchKeyword']
-
-            Object.keys(metaDataInfo).forEach(function (attrname){
-                if (attrname != 'searchKeyword') {
-
-                    var obj = {}
-                    obj[attrname.toLowerCase()] = {}
-
-                    _.split(keywordstr.replace(/\s/g, ''), ',').forEach(element => {
-                        if (element.startsWith('-')) {
-                            obj[attrname.toLowerCase()]['$not'] = {}
-                            obj[attrname.toLowerCase()]['$not']['$in'] = []
-                        }
-                        else{
-                            obj[attrname.toLowerCase()]['$in'] = []
-                        }
-                    })
-
-                    _.split(keywordstr.replace(/\s/g, ''), ',').forEach(element => {
-                        if (element.startsWith('-')) {
-                            obj[attrname.toLowerCase()]['$not']['$in'].push(element.replace('-',''))
-                        } else {
-                            obj[attrname.toLowerCase()]['$in'].push(element)
-                        }
-                    })
-
-                    newquery['$or'].push(obj)
-
-                }
-            })
-
+            var keywordstr = metaDataInfo['searchKeyword']            
+            var properties = Object.keys(new MetaDataModel())
             
+            _.split(keywordstr, ' and ').forEach(function (element) {
+
+                if (element.includes(' not ')) {
+                    var notayri = _.split(element, ' not ')
+                    var firstand = _.split(notayri[0], ':')
+
+                    var andfield = firstand[0] == undefined ? firstand[0] : firstand[0].trim()
+                    var andvalue = firstand[1] == undefined ? firstand[1] : firstand[1].trim()
+                    var andattr = _.find(properties, (v) => v.toLowerCase() == andfield.toLowerCase())
+                   
+                    obj[andattr] = andvalue
+                    
+                    notayri.shift()
+                    notayri.forEach(function (not) {
+                        var notword = _.split(not, ':')
+                        var notfield = notword[0] == undefined ? notword[0] : notword[0].trim()
+                        var notvalue = notword[1] == undefined ? notword[1] : notword[1].trim()
+                        var notattr = _.find(properties, (v) => v.toLowerCase() == notfield.toLowerCase())
+                        obj[notattr] = {
+                            '$ne': notvalue
+                        }
+                        
+                    })
+                } else {
+                    var andword = _.split(element, ':')
+                    
+                    var andfield2 = andword[0] == undefined ? andword[0] : andword[0].trim()
+                    var andvalue2 = andword[1] == undefined ? andword[1] : andword[1].trim()
+                    var andattr2 = _.find(properties, (v) => v.toLowerCase() == andfield2.toLowerCase())                    
+                    obj[(andattr2)] = andvalue2
+                }
+
+            })
+            newquery['$or'].push(obj)
+
         }
+        
 
         Object.keys(metaDataInfo).forEach(function (attrname) {
+
+            if(true){
+                
+
+
             if (metaDataInfo[attrname] != undefined & attrname != 'searchKeyword') {
                 
                 // creates attribute name object for query
-                newquery[attrname.toLowerCase()] = {}
+                obj[attrname.toLowerCase()] = {}
 
                 // incoming search string for attribute
                 var incominstr = metaDataInfo[attrname]
@@ -131,35 +165,35 @@ module.exports = class Submission {
                 // else it creates 'in' array
                 // no need to delete because if string doesnt have minus no need to add array
                 // if we add next foreach above we can overwrite array so..
-                _.split(incominstr.replace(/\s/g, ''), ',').forEach(element => {
-                    if (element.startsWith('-')) {
-                        newquery[attrname.toLowerCase()]['$not'] = {}
-                        newquery[attrname.toLowerCase()]['$not']['$in'] = []
+                _.split(incominstr, 'or ').forEach(function (element) {
+                    if (element.includes('not ')) {
+                        obj[attrname.toLowerCase()]['$not'] = {}
+                        obj[attrname.toLowerCase()]['$not']['$in'] = []
+                    } else {
+                        obj[attrname.toLowerCase()]['$in'] = []
                     }
-                    else{
-                        newquery[attrname.toLowerCase()]['$in'] = []
+                })
+
+                // again it checks incoming string if it has minus adds to not in query
+                // else adds to in query for specific attribute 
+                _.split(incominstr, 'or ').forEach(function (element) {
+                    if (element.includes('not ')) {
+                        obj[attrname.toLowerCase()]['$not']['$in'].push(element.replace('not ', '').trim())
+                    } else {
+                        obj[attrname.toLowerCase()]['$in'].push(element.trim())
                     }
                 })
                 
-                // again it checks incoming string if it has minus adds to not in query
-                // else adds to in query for specific attribute 
-                _.split(incominstr.replace(/\s/g, ''), ',').forEach(element => {
-                    if (element.startsWith('-')) {
-                        newquery[attrname.toLowerCase()]['$not']['$in'].push(element.replace('-',''))
-                    } else {
-                        newquery[attrname.toLowerCase()]['$in'].push(element)
-                    }
-                })
-
             }
-        });
 
+        }
+        });
 
         const db = getDb();
         var getSubmissionIds = new Promise((resolve, reject) => {
             db.collection("metadata")
                 .find(
-                    newquery
+                    obj
                 )
                 .toArray()
                 .then(result => {
@@ -189,7 +223,8 @@ module.exports = class Submission {
                 .find({
                     _id: (submissionquery = submissionquery["$in"].length ?
                         submissionquery :
-                        Array.empty)
+                        Array.empty),
+                    statusValid: true
                 })
                 .toArray()
                 .then(result => {
