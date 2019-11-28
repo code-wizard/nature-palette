@@ -23,7 +23,7 @@ var session      = require('express-session');
 require('./passport')(passport); // pass passport for configuration
 
 process.env.NODE_ENV = 'production';
-const config = require('./config.js');
+// const config = require('./config.js');
 process.env.NODE_ENV = 'development';
 // const config = require('./config.js');
 
