@@ -176,7 +176,7 @@
 
                         <form action="download" method="POST">
                             <span><%= metadataList.length %> Results found </span>
-                            <input type="hidden" name="metadataList" value="<%= JSON.stringify(metadataList) %>">
+                            <input type="hidden" name="metadataIdList" value="<%= JSON.stringify(metadataIdList) %>">
                             <button id="showDownloadModal" type="submit" class="btn btn-success"
                                 data-submission-count="<%= submissionList.length %>">
                                  Download <i class="fa fa-download" aria-hidden="true"></i></button>

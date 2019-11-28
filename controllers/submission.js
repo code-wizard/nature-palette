@@ -235,9 +235,12 @@ exports.getListSubmission = (req, res, next) => {
                 converted['metadatalist'].push(convertMetadataLowerToCamelCase(element))
             });
 
+            var metadataIdList = _.map(x, "_id");
+
             res.render('search', {
                 submissionList: converted['submissionlist'],
                 metadataList: converted['metadatalist'],
+                metadataIdList: metadataIdList,
                 listVisible: true,
                 req:req
             })
@@ -276,16 +279,21 @@ exports.downloadAll = (req, res, next) => {
 }
 exports.downloadSelectedData = (req, res, next) => {
 
-    var metaList = JSON.parse(req.body.metadataList);
+    var metaIdList = JSON.parse(req.body.metadataIdList);
 
      // with that meta data list, return raw files that matches metadata id
-    rawFileModel.getListOfRawFileByMetaDataIdList(metaList)
+    rawFileModel.getListOfRawFileByMetaDataIdList(metaIdList)
         .then(rawfilelist => {
-            var preparingZipPromise = fileFuncs.prepareDownloadZipFile(metaList, rawfilelist)
-            preparingZipPromise.then(function (value) {
-                console.log(value)
-                res.download(value)
+            metaDataModel.getMetaDataByIdList(metaIdList)
+            .then(metadataList => {
+                var preparingZipPromise = fileFuncs.prepareDownloadZipFile(metadataList, rawfilelist)
+                preparingZipPromise.then(function (value) {
+                    console.log(value)
+                    res.download(value)
+                })
             })
+
+            
         })
 }
 

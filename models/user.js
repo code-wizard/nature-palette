@@ -4,7 +4,10 @@ const Joi = require('joi');
 const bcrypt = require("bcrypt");
 const mongoose = require('mongoose');
 
-mongoose.connect(global.gConfig.database);
+mongoose.connect(global.gConfig.database, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true
+});
 //simple schema
 const UserSchema = new mongoose.Schema({
   firstName: {
@@ -36,11 +39,11 @@ const UserSchema = new mongoose.Schema({
 });
 
 // checking if password is valid
-UserSchema.methods.validPassword = function(password) {
+UserSchema.methods.validPassword = function (password) {
   return bcrypt.compareSync(password, this.password);
 };
 // generating a hash
-UserSchema.methods.generateHash = function(password) {
+UserSchema.methods.generateHash = function (password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };
 
@@ -54,12 +57,18 @@ function validateUser(user) {
     email: Joi.string().min(5).max(255).required().email(),
     password: Joi.string().min(3).max(255).required(),
     password_confirmation: Joi.any().valid(Joi.ref('password'))
-              .required().options({ language: { any: { allowOnly: 'must match password' } } })
+      .required().options({
+        language: {
+          any: {
+            allowOnly: 'must match password'
+          }
+        }
+      })
 
   };
 
   return Joi.validate(user, schema);
 }
 
-exports.User = User; 
+exports.User = User;
 exports.validate = validateUser;
