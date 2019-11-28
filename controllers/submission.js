@@ -212,12 +212,13 @@ exports.getListSubmission = (req, res, next) => {
     searchMetaData.order = !body.order.trim() ? undefined : body.order;
     searchMetaData.family = !body.family.trim() ? undefined : body.family;
     searchMetaData.genus = !body.genus.trim() ? undefined : body.genus;
-    searchMetaData.specificEpithet = !body.specificepithet.trim() ? undefined : body.specificEpithet;
+    searchMetaData.specificEpithet = !body.specificEpithet.trim() ? undefined : body.specificEpithet;
     searchMetaData.infraspecificEpithet = !body.infraspecificEpithet.trim() ? undefined : body.infraspecificEpithet;
     searchMetaData.sex = !body.sex.trim() ? undefined : body.sex;
     searchMetaData.lifeStage = !body.lifeStage.trim() ? undefined : body.lifeStage;
     searchMetaData.country = body.country = !body.country.trim() ? undefined : body.country;
     searchMetaData.patch = body.patch = !body.patch.trim() ? undefined : body.patch;
+   
 
     submissionModel.getByMetaDataFilter(searchMetaData)
         .then(submissionResponse => {
@@ -226,21 +227,25 @@ exports.getListSubmission = (req, res, next) => {
             converted['submissionlist'] = submissionResponse['submissionlist']
             converted['metadatalist'] = []
 
+            var allMetadataList = submissionResponse['metadatalist']
+            var metadataOneReplicate = _.filter(allMetadataList, {replicate: '1'});
             var submissionIdList = converted['submissionlist'].map(x => x._id.toString())
 
-            var x = submissionResponse['metadatalist'].filter(function (item) {
+            var metadataIncludesSubmission = metadataOneReplicate.filter(function (item) {
                 return submissionIdList.includes(item.submissionId.toString());
             })
-            x.forEach(element => {
+
+            
+            metadataIncludesSubmission.forEach(element => {
                 converted['metadatalist'].push(convertMetadataLowerToCamelCase(element))
             });
 
-            var metadataIdList = _.map(x, "_id");
+            var metadataIdListDownload = _.map(allMetadataList, "_id");
 
             res.render('search', {
                 submissionList: converted['submissionlist'],
                 metadataList: converted['metadatalist'],
-                metadataIdList: metadataIdList,
+                metadataIdList: metadataIdListDownload,
                 listVisible: true,
                 req:req
             })
@@ -308,6 +313,11 @@ function convertMetadataLowerToCamelCase(lower) {
         Object.keys(upper).forEach(function (metaattr) {
             if (metaattr.toLowerCase() == attrname) {
                 resp[metaattr] = lower[attrname]
+                added = true
+            }
+            else if(attrname == 'class'){
+                // special case for class name
+                resp['className'] = lower[attrname]
                 added = true
             }
         })

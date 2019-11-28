@@ -84,21 +84,21 @@
 
                                         <div class="row">
                                             <div class="col-md-4 mb-3">
-                                                <input type="text" class="form-control" id="institutioncode"
+                                                <input type="text" class="form-control" id="institutionCode"
                                                     placeholder="Institution code" value="" name="institutionCode">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <input type="text" class="form-control" id="collectioncode"
+                                                <input type="text" class="form-control" id="collectionCode"
                                                     name="collectionCode" placeholder="Collection code" value="">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <input type="text" class="form-control" id="catalogueno"
+                                                <input type="text" class="form-control" id="catalogNumber"
                                                     name="catalogNumber" placeholder="Catalogue Number" value="">
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-4 mb-3">
-                                                <input type="text" class="form-control" id="class" placeholder="Class"
+                                                <input type="text" class="form-control" id="className" placeholder="Class"
                                                     value="" name="className">
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -117,7 +117,7 @@
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <input type="text" class="form-control" id="specificEpithet"
-                                                    name="specificepithet" placeholder="Specific Epithet" value="">
+                                                    name="specificEpithet" placeholder="Specific Epithet" value="">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <input type="text" class="form-control" id="infraspecificEpithet"
@@ -131,7 +131,7 @@
                                                     name="sex">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <input type="text" class="form-control" id="lifestage"
+                                                <input type="text" class="form-control" id="lifeStage"
                                                     placeholder="Life Stage" name="lifeStage" value="">
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -179,88 +179,42 @@
                             <input type="hidden" name="metadataIdList" value="<%= JSON.stringify(metadataIdList) %>">
                             <button id="showDownloadModal" type="submit" class="btn btn-success"
                                 data-submission-count="<%= submissionList.length %>">
-                                 Download <i class="fa fa-download" aria-hidden="true"></i></button>
+                                Download <i class="fa fa-download" aria-hidden="true"></i></button>
                         </form>
 
                     </div>
                 </div>
             </div>
-            <% if (submissionList.length) {%>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm table-hover">
-                        <thead>
+            <% if (metadataList.length) {%>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead>
                         <tr>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Institution Affiliation</th>
-                            <th>Type of Data</th>
-                            <th>Data From</th>
-                            <th>Published?</th>
-                            <th>Reference</th>
-                            <th>DOI</th>
-                            <th colspan="2">
-                            </th>
+                            <th>genus</th>
+                            <th>specificEpithet</th>
+                            <th>infraspecificEpithet</th>
+                            <th>sex</th>
+                            <th>lifeStage</th>
+                            <th>Patch</th>
                         </tr>
-                        </thead>
-                        <tbody>
-                        <% for (let submission of submissionList) { %>
-                            <tr class="accordion-toggle">
-                                <td><%= submission.firstName %></td>
-                                <td><%= submission.lastName %></td>
-                                <td><%= submission.institutionAffiliation %></td>
-                                <td><%= submission.typeOfData %></td>
-                                <td><%= submission.dataFrom %></td>
-                                <td><%= submission.published %></td>
-                                <td><%= submission.reference %></td>
-                                <td><%= submission.doi %></td>
-                                </td>
-                                <td>
-                                    <a class="" data-toggle="collapse" href="#<%= 'yalin' + submission._id %>" role="button"
-                                       aria-expanded="false">
-                                        MetaData
-                                    </a>
-                                </td>
-
-                            </tr>
-                            <tr id="<%= 'yalin' + submission._id %>" class="collapse show">
-                                <td colspan="9">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-sm">
-                                            <thead>
-                                            <tr>
-                                                <th>genus</th>
-                                                <th>specificEpithet</th>
-                                                <th>infraspecificEpithet</th>
-                                                <th>sex</th>
-                                                <th>lifeStage</th>
-                                                <th>Patch</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <% for (let metadata of metadataList.filter(md => { return md.submissionId.toString() == submission._id.toString(); } )) { %>
-                                                <tr class="accordion-toggle metadata-detail pointer"
-                                                    data-id="<%= metadata._id %>">
-                                                    <td data-id="<%= metadata._id %>"><%= metadata.genus %></td>
-                                                    <td data-id="<%= metadata._id %>"><%= metadata.specificEpithet %></td>
-                                                    <td data-id="<%= metadata._id %>"><%= metadata.infraspecificEpithet %>
-                                                    </td>
-                                                    <td data-id="<%= metadata._id %>"><%= metadata.sex %></td>
-                                                    <td data-id="<%= metadata._id %>"><%= metadata.lifeStage %></td>
-                                                    <td data-id="<%= metadata._id %>"><%= metadata.patch %></td>
-                                                </tr>
-                                            <% } %>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                </td>
-                            </tr>
+                    </thead>
+                    <tbody>
+                        <% for (let metadata of metadataList) { %>
+                        <tr class="accordion-toggle metadata-detail pointer" data-id="<%= metadata._id %>">
+                            <td data-id="<%= metadata._id %>"><%= metadata.genus %></td>
+                            <td data-id="<%= metadata._id %>"><%= metadata.specificEpithet %></td>
+                            <td data-id="<%= metadata._id %>"><%= metadata.infraspecificEpithet %>
+                            </td>
+                            <td data-id="<%= metadata._id %>"><%= metadata.sex %></td>
+                            <td data-id="<%= metadata._id %>"><%= metadata.lifeStage %></td>
+                            <td data-id="<%= metadata._id %>"><%= metadata.patch %></td>
+                        </tr>
                         <% } %>
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
+            </div>
             <% } else { %>
-                <div>No result found</div>
+            <div>No result found</div>
             <% }%>
 
 
@@ -331,4 +285,3 @@
 </body>
 
 </html>
-

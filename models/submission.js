@@ -148,14 +148,10 @@ module.exports = class Submission {
 
         Object.keys(metaDataInfo).forEach(function (attrname) {
 
-            if(true){
-                
-
-
             if (metaDataInfo[attrname] != undefined & attrname != 'searchKeyword') {
                 
                 // creates attribute name object for query
-                obj[attrname.toLowerCase()] = {}
+                obj[attrname] = {}
 
                 // incoming search string for attribute
                 var incominstr = metaDataInfo[attrname]
@@ -167,10 +163,10 @@ module.exports = class Submission {
                 // if we add next foreach above we can overwrite array so..
                 _.split(incominstr, 'or ').forEach(function (element) {
                     if (element.includes('not ')) {
-                        obj[attrname.toLowerCase()]['$not'] = {}
-                        obj[attrname.toLowerCase()]['$not']['$in'] = []
+                        obj[attrname]['$not'] = {}
+                        obj[attrname]['$not']['$in'] = []
                     } else {
-                        obj[attrname.toLowerCase()]['$in'] = []
+                        obj[attrname]['$in'] = []
                     }
                 })
 
@@ -178,16 +174,19 @@ module.exports = class Submission {
                 // else adds to in query for specific attribute 
                 _.split(incominstr, 'or ').forEach(function (element) {
                     if (element.includes('not ')) {
-                        obj[attrname.toLowerCase()]['$not']['$in'].push(element.replace('not ', '').trim())
+                        obj[attrname]['$not']['$in'].push(element.replace('not ', '').trim())
                     } else {
-                        obj[attrname.toLowerCase()]['$in'].push(element.trim())
+                        obj[attrname]['$in'].push(element.trim())
                     }
                 })
                 
             }
 
-        }
+        
         });
+
+        // console.log(metaDataInfo[attrname])
+                console.log('o: ', obj)
 
         const db = getDb();
         var getSubmissionIds = new Promise((resolve, reject) => {
