@@ -277,6 +277,13 @@ const prepareDownloadZipFile = (metadatalist, rawfilelist, cb) => {
     var csvfilename = now + '-meta-data' + '.csv'
     var zipfilepath = path.join(rootpath, 'data-files', zipfilename)
     var csvfilepath = path.join(rootpath, 'data-files', csvfilename)
+
+    // change necessary column names
+    metadatalist.forEach(element => {
+        delete element._id
+        delete Object.assign(element, {['SubmissionNumber']: element['submissionId'] })['submissionId'];
+    });
+
     const csvFromArrayOfObjects = convertArrayToCSV(metadatalist);
 
     return new Promise(function (resolve, reject) {

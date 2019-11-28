@@ -185,9 +185,6 @@ module.exports = class Submission {
         
         });
 
-        // console.log(metaDataInfo[attrname])
-                console.log('o: ', obj)
-
         const db = getDb();
         var getSubmissionIds = new Promise((resolve, reject) => {
             db.collection("metadata")
