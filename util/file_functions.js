@@ -64,7 +64,7 @@ const unzipRawFiles = (submission, filepath, errorrMessage, metadata, fileNames)
             fs.mkdir('data-files/raw-files-output/' + validFilesNames[0].submissionId, (err) => {
                 //throws error if unable to create director
                 if (err) {
-                    if (err.code == 'EEXIST') cb(null);
+                    if (err.code == 'EEXIST') console.log("exisit")//cb(null);
                     else throw err;
                 } else {
 
