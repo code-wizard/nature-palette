@@ -4,6 +4,7 @@ const router = express.Router();
 const tmp = require('tmp');
 const researches = []
 const path = require("path")
+const auth = require("../middleware/auth");
 const multer = require("multer");
 const frontendControllers = require("../controllers/frontend");
 
@@ -82,8 +83,8 @@ const metaDataController = require("../controllers/metadata");
 //router.post("/save-file", frontendControllers.uploadResearch);
 //router.get("/list-files", frontendControllers.getResearches);
 router.get("/", frontendControllers.getHomePage)
-router.get("/upload-success", submissionController.getUploadSuccess)
-router.post("/submission", upload.fields([{
+router.get("/upload-success", isLoggedIn, submissionController.getUploadSuccess)
+router.post("/submission", isLoggedIn, upload.fields([{
         name: "rawFile",
         maxCount: 1
     },
@@ -92,14 +93,22 @@ router.post("/submission", upload.fields([{
         maxCount: 1
     }
 ]), submissionController.uploadSubmission);
-router.get("/submission", submissionController.uploadSubmission);
+router.get("/submission", isLoggedIn, submissionController.uploadSubmission);
 router.get("/list-files", submissionController.getListSubmission);
 router.get("/search", submissionController.searchView);
-router.post("/search", submissionController.getListSubmission);
+router.post("/search",  submissionController.getListSubmission);
 router.post("/download", submissionController.downloadSelectedData);
-// router.post("/download-all", submissionController.downloadAll);
+//router.post("/download-all", submissionController.downloadAll);
 router.get("/search-detail", submissionController.searchDetail);
+
+// router.get("/forgot-password", frontendControllers.getForgotPassword);
 
 module.exports = {
     routes: router
 };
+
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated())
+        return next();
+    res.status(400).send("<h3> Access Denied. Please <a href='/auth/login'>login</a> to access this page</h3>");
+  }

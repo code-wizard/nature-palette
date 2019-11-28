@@ -51,38 +51,8 @@
     </style>
 </head>
 
-<body>
-    <header class="main-header">
-        <!-- navbar -->
-        <nav class="navbar navbar-toggleable-md bg-info navbar-inverse">
-            <div class="container">
-                <button class="navbar-toggler" data-toggle="collapse" data-target="#mainNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="row">
-                    <div class="col-md-6 mb-6">
-                        <h2>Nature's Palette</h2>
-                    </div>
-
-                    <div class="col-md-6 mb-6">
-                        <div class="collapse navbar-collapse" id="mainNav">
-                            <div class="navbar-nav">
-                                <a class="nav-item nav-link" href="/">Home</a>
-                                <a class="nav-item nav-link active" href="/search">Search</a>
-                                <a class="nav-item nav-link" href="/submission">Upload</a>
-                                <a class="nav-item nav-link" href="#">Join</a>
-                                <a class="nav-item nav-link" href="#">About</a>
-                                <a class="nav-item nav-link" href="#">Help</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    
-
+<body>    
+    <%- include('partials/header') %>
     <div class="container mt-3">
         <div id="demo">
             <hr>

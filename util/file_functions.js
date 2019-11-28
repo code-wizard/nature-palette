@@ -301,28 +301,37 @@ const prepareDownloadZipFile = (metadatalist, rawfilelist, cb) => {
                 name: element.fileName
             })
         })
-
-        new Promise((resolve, reject) => {
-            fs.writeFile(csvfilepath, csvFromArrayOfObjects, function (err) {
-                console.log(err);
-            })
-            resolve(archive.append(fs.createReadStream(csvfilepath), {
-                name: csvfilename
-            }))
-        })
+        fs.writeFile(csvfilepath, csvFromArrayOfObjects, function (err) {
+                    console.log(err);
+                    archive.append(fs.createReadStream(csvfilepath), {
+                        name: csvfilename
+                    })
+                    archive.finalize()
+                })
+                // resolve()
+        // new Promise((resolve, reject) => {
+        //     fs.writeFile(csvfilepath, csvFromArrayOfObjects, function (err) {
+        //         console.log(err);
+        //     })
+        //     resolve(archive.append(fs.createReadStream(csvfilepath), {
+        //         name: csvfilename
+        //     }))
+        // })
 
         output.on('close', function () {
             console.log(archive.pointer() + ' total bytes');
             console.log('archiver has been finalized and the output file descriptor has closed.');
+            console.log(zipfilepath)
             resolve(zipfilepath)
         });
 
         output.on('end', function () {
+            console.log(zipfilepath, "zip path")
             resolve(zipfilepath)
             console.log('Data has been drained');
         });
 
-        archive.finalize()
+        
 
     })
 

@@ -8,10 +8,20 @@ const processRawFiles = require("../util/agenda")
 
 exports.getHomePage = (req, res, next) => {
     res.render("index", {
-        title: "Nature Palette - Add Files",
+        title: "Nature Palette - Home",
         hasError: false,
-        errorMessage: null
+        errorMessage: null,
+        req: req
     });
+}
+
+
+
+
+exports.getForgotPassword = (req, res, next)=>{
+    res.render("forgot-password", {
+        title: "Nature Palette - Password reset"
+    })
 }
 
 exports.uploadResearch = (req, res, next) => {
@@ -77,6 +87,7 @@ exports.uploadResearch = (req, res, next) => {
                  return res.status(422).render("index", {
                         title: "Nature Palette - Add Files",
                         hasError: true,
+                        req: req,
                         errorMessage: `Your metadata is missing some required fileds ${missingRFields}`
                     });
         }
@@ -115,29 +126,29 @@ exports.uploadResearch = (req, res, next) => {
     // res.redirect("/list-files")
 }
 
-exports.getResearches = (req, res, next) => {
+// exports.getResearches = (req, res, next) => {
 
-    Research.getDarwin("museum")
-        .then(result => {
-            // console.log(result.length)
-            // for (let d of result){
-            //     console.log(d)
-            // }
-            //console.log(result, "success")
-        })
-        .catch(err => {
-            console.log(err, "error")
-        })
-    Research.fetchAll()
-        .then(researches => {
-            // console.log(researches, 'Here now')
-            res.render('list', {
-                title: "All Research Files",
-                researches: researches
-            })
-        })
-        .catch(err => {
-            console.log(err)
-        })
+//     Research.getDarwin("museum")
+//         .then(result => {
+//             // console.log(result.length)
+//             // for (let d of result){
+//             //     console.log(d)
+//             // }
+//             //console.log(result, "success")
+//         })
+//         .catch(err => {
+//             console.log(err, "error")
+//         })
+//     Research.fetchAll()
+//         .then(researches => {
+//             // console.log(researches, 'Here now')
+//             res.render('list', {
+//                 title: "All Research Files",
+//                 researches: researches
+//             })
+//         })
+//         .catch(err => {
+//             console.log(err)
+//         })
 
-}
+// }
