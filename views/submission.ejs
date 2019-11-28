@@ -60,35 +60,7 @@
 </head>
 
 <body>
-<header class="main-header">
-    <!-- navbar -->
-    <nav class="navbar navbar-toggleable-md bg-info navbar-inverse">
-        <div class="container">
-            <button class="navbar-toggler" data-toggle="collapse" data-target="#mainNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="row">
-                <div class="col-md-6 mb-6">
-                    <h2>Nature's Palette</h2>
-                </div>
-
-                <div class="col-md-6 mb-6">
-                    <div class="collapse navbar-collapse" id="mainNav">
-                        <div class="navbar-nav">
-                            <a class="nav-item nav-link" href="/">Home</a>
-                            <a class="nav-item nav-link" href="/search">Search</a>
-                            <a class="nav-item nav-link active" href="/submission">Upload</a>
-                            <a class="nav-item nav-link" href="#">Join</a>
-                            <a class="nav-item nav-link" href="#">About</a>
-                            <a class="nav-item nav-link" href="#">Help</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-</header>
-
+    <%- include('partials/header') %>
     <div class="container">
 
         <div class="row" style="margin-top: 150px;">
@@ -231,6 +203,8 @@
                                                             <span class="text-danger">*</span></label>
                                                         <div class="col-md-8">
                                                             <input type="text" data-parsley-group="step-2"
+                                                                value="<%= req.user.firstName %>"
+                                                                readonly
                                                                 data-parsley-required="true" name="firstName"
                                                                 placeholder="John" class="form-control">
                                                         </div>
@@ -242,6 +216,8 @@
                                                             <span class="text-danger">*</span></label>
                                                         <div class="col-md-8">
                                                             <input type="text" data-parsley-group="step-2"
+                                                                value="<%= req.user.lastName %>"
+                                                                readonly
                                                                 data-parsley-required="true" name="lastName"
                                                                 placeholder="Smith" class="form-control">
                                                         </div>
@@ -252,6 +228,8 @@
                                                             class="col-md-3 text-md-left col-form-label">Email</label>
                                                         <div class="col-md-8">
                                                             <input type="text" name="email"
+                                                                value="<%= req.user.email %>"
+                                                                readonly
                                                                 placeholder="you@example.com" class="form-control">
                                                         </div>
                                                     </div>
@@ -261,6 +239,7 @@
                                                         <div class="col-md-8">
                                                             <input type="text" data-parsley-group="step-2"
                                                                 data-parsley-required="true"
+                                                                value="<%= req.body.institutionAffiliation%>"
                                                                 name="institutionAffiliation" placeholder=""
                                                                 class="form-control">
                                                         </div>
@@ -269,7 +248,9 @@
                                                         <label class="col-md-3 text-md-left col-form-label">Type of Data
                                                             <span class="text-danger">*</span></label>
                                                         <div class="col-md-8">
-                                                            <select id="inputState" class="form-control"
+                                                            <select id="inputState"
+                                                            value="<%= req.body.typeOfData %>"
+                                                            class="form-control"
                                                                 name="typeOfData" data-parsley-group="step-2"
                                                                 data-parsley-required="true">
                                                                 <option value="">Choose from list</option>
@@ -286,7 +267,9 @@
                                                         <label class="col-md-3 text-md-left col-form-label">Data from
                                                             <span class="text-danger">*</span></label>
                                                         <div class="col-md-8">
-                                                            <select id="inputState" class="form-control"
+                                                            <select id="inputState" 
+                                                            value="<%= req.body.dataFrom %>"
+                                                            class="form-control"
                                                                 data-parsley-group="step-2" data-parsley-required="true"
                                                                 name="dataFrom">
                                                                 <option selected value="">Choose from list</option>
@@ -319,6 +302,7 @@
                                                                 class="col-md-3 text-md-left col-form-label">DOI</label>
                                                             <div class="col-md-8">
                                                                 <input type="text" name="doi"
+                                                                value="<%= req.body.doi%>"
                                                                     placeholder="Digital object identifier"
                                                                     class="form-control">
                                                             </div>
@@ -328,6 +312,7 @@
                                                                 class="col-md-3 text-md-left col-form-label">Reference</label>
                                                             <div class="col-md-8">
                                                                 <input type="text" name="reference"
+                                                                value="<%= req.body.reference%>"
                                                                     placeholder="Reference- Citation of the publication"
                                                                     class="form-control">
                                                             </div>
@@ -352,7 +337,8 @@
                                                         style="display: none">
                                                         <label class="col-md-3 text-md-left col-form-label">Date</label>
                                                         <div class="col-md-8">
-                                                            <input type="date" name="releaseDate" max="3000-12-31"
+                                                            <input type="date" value="<%= req.body.releaseDate%>"
+                                                             name="releaseDate" max="3000-12-31"
                                                                 min="1000-01-01" class="form-control">
                                                         </div>
                                                     </div>

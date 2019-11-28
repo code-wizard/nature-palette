@@ -44,12 +44,23 @@ module.exports.uploadSubmission = (req, res) => {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
+                req: req,
                 errorMessage: "Attach only .csv or .zip file"
             });
-        } else if (parseInt(submission.embargo) && !submission.releaseDate) {
+        } else if(["Transmittance", "Irradiance"].includes(submission.typeOfData)){
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
+                success: false,
+                req: req,
+                errorMessage: "We are currenly accepting only Transamittance data"
+            });
+        }
+        else if (parseInt(submission.embargo) && !submission.releaseDate) {
+            return res.status(422).render("submission", {
+                title: "Nature Palette - Upload",
+                hasError: true,
+                req: req,
                 success: false,
                 errorMessage: "Please specify embargo expiry date"
             });
@@ -58,6 +69,7 @@ module.exports.uploadSubmission = (req, res) => {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
+                req: req,
                 errorMessage: "Embargo release date must be in the future."
             });
         } else if (submission.releaseDate && dateFn.differenceInYears(new Date(), new Date(submission.releaseDate)) > 1) {
@@ -65,12 +77,14 @@ module.exports.uploadSubmission = (req, res) => {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
+                req: req,
                 errorMessage: "Embargo release date must not be greater then 1 year from today."
             });
         } else if (submission.published === "yes" && !submission.doi) {
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
+                req: req,
                 success: false,
                 errorMessage: "Digital Object Reference is required for a published research."
             });
@@ -79,6 +93,7 @@ module.exports.uploadSubmission = (req, res) => {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
+                req: req,
                 errorMessage: "Reference is required for a published research."
             });
         }
@@ -111,6 +126,7 @@ module.exports.uploadSubmission = (req, res) => {
                         title: "Nature Palette - Upload",
                         hasError: true,
                         success: false,
+                        req: req,
                         errorMessage: `Your metadata is missing some required fileds ${missingRFields}`
                     });
                 } else {
@@ -175,6 +191,7 @@ module.exports.uploadSubmission = (req, res) => {
             title: "Submit Research",
             hasError: false,
             success: false,
+            req: req,
         })
     }
     // kaydet
@@ -209,6 +226,7 @@ exports.getListSubmission = (req, res, next) => {
                 submissionList: submissionResponse['submissionlist'],
                 metadataList: submissionResponse['metadatalist'],
                 listVisible: true,
+                req: req,
             })
         })
         .catch(err => {
@@ -220,7 +238,8 @@ exports.searchView = (req, res, next) => {
 
     res.render('search', {
         submissionList: undefined,
-        listVisible: false
+        listVisible: false,
+        req: req,
     })
 
 }
@@ -229,16 +248,16 @@ exports.searchDetail = (req, res, next) => {
     .then((metadata)=>{
         exclusionList = ["flag", "_id", "valid", "submissionId"]
         console.log(metadata)
-        res.render("search-detail", {metadata: metadata, exclusionList:exclusionList})
+        res.render("search-detail", {metadata: metadata, exclusionList:exclusionList,req: req})
     })
 }
 
 exports.getUploadSuccess = (req, res, next) => {
-    res.render("subsuccess")
+    res.render("subsuccess", {req: req})
 }
 
 exports.downloadAll = (req, res, next) => {
-    res.status(200).send("Success")
+    res.status(200).send("Success", {req: req})
 }
 exports.downloadSelectedData = (req, res, next) => {
 
