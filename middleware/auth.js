@@ -6,7 +6,9 @@ const config = require('../config.js')
 module.exports = function isLoggedIn(req, res, next) {
   if (req.isAuthenticated())
       return next();
-  res.status(400).json({
-      'message': 'access denied'
-  });
+  res.status(400).render("access-denied", {req: req})
+  
+  // send({
+  //     'message': 'access denied'
+  // });
 }

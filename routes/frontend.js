@@ -110,5 +110,6 @@ module.exports = {
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated())
         return next();
-    res.status(400).send("<h3> Access Denied. Please <a href='/auth/login'>login</a> to access this page</h3>");
+    res.status(400).render("access-denied", {req: req})
+    // res.status(400).send("<h3> Access Denied. Please <a href='/auth/login'>login</a> to access this page</h3>");
   }

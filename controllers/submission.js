@@ -247,7 +247,8 @@ exports.getListSubmission = (req, res, next) => {
                 metadataList: converted['metadatalist'],
                 metadataIdList: metadataIdListDownload,
                 listVisible: true,
-                req:req
+                req:req,
+                query: searchMetaData.searchKeyword
             })
         })
         .catch(err => {
@@ -260,6 +261,7 @@ exports.searchView = (req, res, next) => {
         submissionList: undefined,
         listVisible: false,
         req: req,
+        query:""
     })
 
 }

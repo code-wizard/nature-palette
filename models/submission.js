@@ -108,10 +108,10 @@ module.exports = class Submission {
             var keywordstr = metaDataInfo['searchKeyword']            
             var properties = Object.keys(new MetaDataModel())
             
-            _.split(keywordstr, ' and ').forEach(function (element) {
+            _.split(keywordstr, ' AND ').forEach(function (element) {
 
-                if (element.includes(' not ')) {
-                    var notayri = _.split(element, ' not ')
+                if (element.includes(' NOT ')) {
+                    var notayri = _.split(element, ' NOT ')
                     var firstand = _.split(notayri[0], ':')
 
                     var andfield = firstand[0] == undefined ? firstand[0] : firstand[0].trim()
@@ -161,8 +161,8 @@ module.exports = class Submission {
                 // else it creates 'in' array
                 // no need to delete because if string doesnt have minus no need to add array
                 // if we add next foreach above we can overwrite array so..
-                _.split(incominstr, 'or ').forEach(function (element) {
-                    if (element.includes('not ')) {
+                _.split(incominstr, 'OR ').forEach(function (element) {
+                    if (element.includes('NOT ')) {
                         obj[attrname]['$not'] = {}
                         obj[attrname]['$not']['$in'] = []
                     } else {
@@ -172,9 +172,9 @@ module.exports = class Submission {
 
                 // again it checks incoming string if it has minus adds to not in query
                 // else adds to in query for specific attribute 
-                _.split(incominstr, 'or ').forEach(function (element) {
-                    if (element.includes('not ')) {
-                        obj[attrname]['$not']['$in'].push(element.replace('not ', '').trim())
+                _.split(incominstr, 'OR ').forEach(function (element) {
+                    if (element.includes('NOT ')) {
+                        obj[attrname]['$not']['$in'].push(element.replace('NOT ', '').trim())
                     } else {
                         obj[attrname]['$in'].push(element.trim())
                     }
