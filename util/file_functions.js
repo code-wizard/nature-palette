@@ -12,6 +12,7 @@ const {
 
 const RawFile = require("../models/rawfile")
 const MetaData = require("../models/metadata")
+const SubmissionModel = require("../models/submission")
 const emails = require("./emails")
 
 
@@ -29,101 +30,232 @@ const readRows = (filepath, option) => {
 }
 
 const unzipRawFiles = (submission, filepath, errorrMessage, metadata, fileNames) => {
-    // processRawFiles.readRawFiles("")
-    // filepath = "data-files/2019-11-06T15:31:22.850Z-2019.09.19 Example raw files.zip"
+
+    var mistakeDifferentFileName = false
+
     const zip = new StreamZip({
         file: filepath,
         storeEntries: true
     });
+
     //hold the name of the zipped folder
     let zipdirName
+
     zip.on('ready', () => {
         rawFiles = []
+
         // Contains metadata with corresponding raw files
-        validFilesNames = metadata.filter((item) => {
-            return !item.flag
-        })
+        validFilesNames = metadata
+
         if (zip.entriesCount - 1 !== fileNames.length) {
-            console.log("entered here")
+
             errorrMessage.push({
-                message: "Metadata filenames does not match the number of raw files uploaded. Only valid metadata will be released"
+                message: "The number of metadata rows do not match the number of raw files uploaded. Please check your files you uploaded."
             })
-            //send email to client with error messages
-            // return
-        }
-        const dirName = 'data-files/raw-files-output/' + validFilesNames[0].submissionId;
-    
-        // { recursive: true }
-        // if(!fs.exists('data-files/raw-files-output/')){
+
+            let message = emails.prepareErrorMessageHTML(errorrMessage, submission)
+            emails.sendEmail(submission.email, message)
+
+
+        } else {
+            // same number of files
+            const dirName = 'data-files/raw-files-output/' + validFilesNames[0].submissionId;
+
             fs.mkdir('data-files/raw-files-output/' + validFilesNames[0].submissionId, (err) => {
                 //throws error if unable to create director
                 if (err) {
-                    console.log(err.code, "hellow world")
-                    if (err.code == 'EEXIST') cb(null); 
+                    if (err.code == 'EEXIST') cb(null);
                     else throw err;
-                }
+                } else {
 
+                    var checkFileNames = new Promise(function (resolve, reject) {
+                        // for each file in zip file
+                        for (const [index, [, entry]] of Object.entries(Object.entries(zip.entries()))) {
 
-                for (const [index, [, entry]] of Object.entries(Object.entries(zip.entries()))) {
-                    // console.log(index, entry)
-                    // const desc = entry.isDirectory ? 'directory' : `${entry.size} bytes`;
-                    if (!entry.isDirectory) {
-                        i++
-                        let filename = _.replace(entry.name, zipdirName, "")
-                        if (entry.name.includes(fileNames[i])) {
-                            // console.log("File exists", i, entry.name,dirName,"fdfdfd", _.replace(entry.name, dirName, ""))
+                            if (!entry.isDirectory) {
 
-                            // console.log(dirName, "Meta data")
-                            let dirPath = dirName + "/" + filename;
-                            metadata[i]["valid"] = true
-                            rawFiles.push({
-                                metaDataId: metadata[i]._id,
-                                path: dirPath,
-                                type: '',
-                                fileName: filename
+                                i++
+                                let filename = _.replace(entry.name, zipdirName, "")
+                                if (entry.name.includes(fileNames[i])) {
+                                    let dirPath = dirName + "/" + filename;
+                                    // metadata[i]["valid"] = true
+                                    rawFiles.push({
+                                        metaDataId: metadata[i]._id,
+                                        path: dirPath,
+                                        type: submission.dataFrom,
+                                        fileName: filename
+                                    })
+                                    zip.extract(entry.name, dirPath, err => {
+
+                                    })
+                                } else {
+
+                                    let filename = _.replace(entry.name, zipdirName, "")
+                                    mistakeDifferentFileName = true
+                                    errorrMessage.push({
+                                        message: filename + " - No matching metadata row"
+                                    })
+                                }
+                            } else {
+                                zipdirName = entry.name
+                                i = index - 1
+                            }
+
+                        } // for
+
+                        resolve(mistakeDifferentFileName);
+                    });
+
+                    checkFileNames.then(function (differentFileNameStatus) {
+                        // if there is no mistake with file names - validation complete
+                        // now can be saved to database
+                        if (!differentFileNameStatus) {
+
+                            new Promise(function (resolve, reject) {
+                                var errorListRScript = []
+
+                                for (const [index, [, entry]] of Object.entries(Object.entries(zip.entries()))) {
+
+                                    if (!entry.isDirectory) {
+                                        i++
+                                        let filename = _.replace(entry.name, zipdirName, "")
+                                        let dirPath = dirName + "/" + filename;
+
+                                        // R-SCRIPT VALIDATION
+                                        if (false) {
+                                            // check each raw file R Script
+                                            new Promise(function (resolve, reject) {
+                                                resolve(rScriptCheck(dirPath))
+                                            }).then(function (rs) {
+                                                errorListRScript.push(rs)
+                                            })
+                                        }
+
+                                    } else {
+                                        zipdirName = entry.name
+                                        i = index - 1
+                                    }
+                                } // for
+
+                                resolve(errorListRScript)
+                            }).then(function (errorListRScript) {
+
+                                if (errorListRScript.length) {
+                                    console.log("R script validation couldnt pass")
+                                    let message = emails.prepareErrorMessageHTML(errorrMessage, submission)
+                                    emails.sendEmail(submission.email, message)
+                                } else {
+                                    try {
+                                        console.log('metadata: ', metadata)
+                                        console.log('validFilesNames: ', validFilesNames)
+                                        // there is nothing wrong with R script, now it can be saved in db
+                                        MetaData.saveMany(validFilesNames)
+                                            .then(() => {
+                                                RawFile.saveMany(rawFiles).then(() => {
+                                                    let message = emails.successMesg(submission);
+                                                    emails.sendEmail(submission.email, message)
+                                                }).then(() => {
+                                                    SubmissionModel.updateStatusValidById(submission._id)
+                                                })
+                                            })
+                                    } catch (err) {
+                                        console.log("error saving metadata or rawfile", err)
+                                    }
+                                }
+                                // console.log('r list: ', errorListRScript)
                             })
-                            zip.extract(entry.name, dirPath, err => {
-                                // console.log(entry.name, "Nand", dirPath, "Couldn't")
-                                // errorrMessage.push({message:  " Could not read "+filename})
-                            })
+
+
                         } else {
-                            errorrMessage.push({
-                                message: filename + " was not released. No matching metadata row"
-                            })
-                            // remove the meta data without a matching file
-                            metadata[i]["valid"] = false
-                            // console.log("No way!")
-                            continue
+                            if (errorrMessage.length) {
+                                console.log("Raw files and Metadata file names doesnt match")
+                                let message = emails.prepareErrorMessageHTML(errorrMessage, submission)
+                                emails.sendEmail(submission.email, message)
+                            }
                         }
+                    })
 
-                    } else {
-                        zipdirName = entry.name
-                        i = index - 1
-                    }
-                    // console.log(`Entry ${entry.name}: ${desc}`);
+
+
+
+                    // try {
+                    //     // MetaData.saveMany(metadata.filter((item)=>{return item.valid}))
+                    //     MetaData.saveMany(metadata)
+                    //         .then(() => {
+                    //             RawFile.saveMany(rawFiles)
+                    //             let message = emails.successMesg(submission);
+                    //             emails.sendEmail(submission.email, message)
+                    //             console.log("Saving metadata and rawfile done")
+                    //         })
+
+
+                    // } catch (err) {
+                    //     console.log("error saving metadata or rawfile", err)
+                    // }
+
+
+
+
                 }
-                // console.log(rawFiles, "Here")
-                // Note to self, try moving the saving of metadata and raw to a new background process after the
-                // Validation is done
-                try{
-                    // MetaData.saveMany(metadata.filter((item)=>{return item.valid}))
-                    MetaData.saveMany(metadata)
-                    console.log("done saving")
-                    RawFile.saveMany(rawFiles)
-                    console.log("Saving Rawfiles done")
-                    let message = emails.successMesg(submission);
-                    if (errorrMessage.length) {
-                        message = emails.prepareErrorMessageHTML(errorrMessage, submission)
-                    }
-                    emails.sendEmail(submission.email, message)
-                    // Send email to client with list of errors
-                } catch (err) {
-                    console.log("error saving metadata", err)
-                }
+                // for (const [index, [, entry]] of Object.entries(Object.entries(zip.entries()))) {
+                //     if (!entry.isDirectory) {
+
+                //         i++
+                //         let filename = _.replace(entry.name, zipdirName, "")
+                //         if (entry.name.includes(fileNames[i])) {
+
+                //             let dirPath = dirName + "/" + filename;
+                //             metadata[i]["valid"] = true
+                //             rawFiles.push({
+                //                 metaDataId: metadata[i]._id,
+                //                 path: dirPath,
+                //                 type: '',
+                //                 fileName: filename
+                //             })
+                //             zip.extract(entry.name, dirPath, err => {
+                //                 // console.log(entry.name, "Nand", dirPath, "Couldn't")
+                //                 // errorrMessage.push({message:  " Could not read "+filename})
+                //             })
+                //         } else {
+                //             errorrMessage.push({
+                //                 message: filename + " was not released. No matching metadata row"
+                //             })
+                //             // remove the meta data without a matching file
+                //             metadata[i]["valid"] = false
+                //             // console.log("No way!")
+                //             continue
+                //         }
+
+                //     } else {
+                //         zipdirName = entry.name
+                //         i = index - 1
+                //     }
+
+                // }
+                // // console.log(rawFiles, "Here")
+                // // Note to self, try moving the saving of metadata and raw to a new background process after the
+                // // Validation is done
+                // try {
+                //     // MetaData.saveMany(metadata.filter((item)=>{return item.valid}))
+                //     MetaData.saveMany(metadata)
+                //     console.log("done saving")
+                //     RawFile.saveMany(rawFiles)
+                //     console.log("Saving Rawfiles done")
+                //     let message = emails.successMesg(submission);
+                //     if (errorrMessage.length) {
+                //         message = emails.prepareErrorMessageHTML(errorrMessage, submission)
+                //     }
+                //     emails.sendEmail(submission.email, message)
+                //     // Send email to client with list of errors
+                // } catch (err) {
+                //     console.log("error saving metadata", err)
+                // }
+                // }
+
+
 
             });
-        // }
-
+        }
     })
 }
 
@@ -131,18 +263,18 @@ const fieldData = () => {
     return ["FileName", "UniqueID", "genus", "specificEpithet", "Patch", "LightAngle1", "LightAngle2", "ProbeAngle1", "ProbeAngle2", "Replicate"]
 }
 const museumData = () => {
-    return ['fileName', 'institutionCode']
+    return ['FileName', 'institutionCode', 'catalogueNumber', 'genus', 'specificEpithet', 'Patch', 'LightAngle1', 'LightAngle2', 'ProbeAngle1', 'ProbeAngle2', 'Replicate']
     // return ['fileName', 'institutionCode', 
     // 'catalogNumber', 'genus', 'specificEpithet', 'Patch', 'LightAngle1', 'LightAngle2', 
     // 'ProbeAngle1', 'ProbeAngle2', 'Replicate']
 }
 
-const prepareDownloadZipFile = (submissionId, metadatalist, rawfilelist, cb) => {
+const prepareDownloadZipFile = (metadatalist, rawfilelist, cb) => {
 
     var rootpath = path.dirname(require.main.filename)
     var now = Date.now().toString()
-    var zipfilename = now + submissionId + '.zip'
-    var csvfilename = now + submissionId + '.csv'
+    var zipfilename = now + '-nature-palette' + '.zip'
+    var csvfilename = now + '-meta-data' + '.csv'
     var zipfilepath = path.join(rootpath, 'data-files', zipfilename)
     var csvfilepath = path.join(rootpath, 'data-files', csvfilename)
     const csvFromArrayOfObjects = convertArrayToCSV(metadatalist);
@@ -215,21 +347,30 @@ module.exports = {
 // ["FileName","UniqueID","genus","specificEpithet","Patch","LightAngle1","LightAngle2","ProbeAngle1","ProbeAngle2","Replicate"]
 
 
+function rScriptCheck(filepath) {
+    return rOperation(rScriptPath)
+        .data({
+            rawFilePath: filepath
+        })
+        .callSync()
+}
+
 function rScriptTrigger(rawFilePath) {
 
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
             rOperation(rScriptPath)
                 .data({
                     rawFilePath: rawFilePath
                 })
-                .call(function (err, d) {
+                .callSync(function (err, d) {
                     if (err) throw err;
                     resolve(d)
                 })
         }).then(function (value) {
 
             // prints out result of R script - value
-            console.log(value);
+            // console.log('script ici: ', value);
+            return value;
 
             // TODO : will check metrics, if yes then make submission flag TRUE then inform user
         })

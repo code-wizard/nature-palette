@@ -45,7 +45,6 @@ var btnFinish = $('<button></button>').text('Finish')
                                                                 alert('Oops we still have error in the form');
                                                                 return false;
                                                             }else{
-                                                                alert('Great! we are ready to submit form');
                                                                 $('form[name="form-wizard"]').parsley().submit();
                                                                 return false;
                                                             }

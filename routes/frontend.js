@@ -98,7 +98,7 @@ router.get("/list-files", submissionController.getListSubmission);
 router.get("/search", submissionController.searchView);
 router.post("/search",  submissionController.getListSubmission);
 router.post("/download", isLoggedIn, submissionController.downloadSelectedData);
-router.post("/download-all", submissionController.downloadAll);
+//router.post("/download-all", submissionController.downloadAll);
 router.get("/search-detail", submissionController.searchDetail);
 
 // router.get("/forgot-password", frontendControllers.getForgotPassword);
