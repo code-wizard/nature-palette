@@ -269,12 +269,12 @@ const museumData = () => {
     // 'ProbeAngle1', 'ProbeAngle2', 'Replicate']
 }
 
-const prepareDownloadZipFile = (submissionId, metadatalist, rawfilelist, cb) => {
+const prepareDownloadZipFile = (metadatalist, rawfilelist, cb) => {
 
     var rootpath = path.dirname(require.main.filename)
     var now = Date.now().toString()
-    var zipfilename = now + submissionId + '.zip'
-    var csvfilename = now + submissionId + '.csv'
+    var zipfilename = now + '-nature-palette' + '.zip'
+    var csvfilename = now + '-meta-data' + '.csv'
     var zipfilepath = path.join(rootpath, 'data-files', zipfilename)
     var csvfilepath = path.join(rootpath, 'data-files', csvfilename)
     const csvFromArrayOfObjects = convertArrayToCSV(metadatalist);

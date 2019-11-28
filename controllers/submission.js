@@ -209,15 +209,15 @@ exports.getListSubmission = (req, res, next) => {
             converted['submissionlist'] = submissionResponse['submissionlist']
             converted['metadatalist'] = []
 
-            var submissionIdList = converted['submissionlist'].map(x=> x._id.toString())
-            
-            var x = submissionResponse['metadatalist'].filter(function(item) {  
+            var submissionIdList = converted['submissionlist'].map(x => x._id.toString())
+
+            var x = submissionResponse['metadatalist'].filter(function (item) {
                 return submissionIdList.includes(item.submissionId.toString());
             })
             x.forEach(element => {
                 converted['metadatalist'].push(convertMetadataLowerToCamelCase(element))
             });
-            
+
             res.render('search', {
                 submissionList: converted['submissionlist'],
                 metadataList: converted['metadatalist'],
@@ -246,7 +246,6 @@ exports.searchDetail = (req, res, next) => {
             })
         })
 }
-
 exports.getUploadSuccess = (req, res, next) => {
     res.render("subsuccess")
 }
@@ -255,23 +254,16 @@ exports.downloadAll = (req, res, next) => {
 }
 exports.downloadSelectedData = (req, res, next) => {
 
-    var submissionIdThatWillBeDownloaded = req.body.submissionId;
+    var metaList = JSON.parse(req.body.metadataList);
 
-    // get meta data list
-    metaDataModel.getListOfMetaDataFileBySubmissionId(submissionIdThatWillBeDownloaded)
-        .then(metadatalist => {
-
-            // with that meta data list, return raw files that matches metadata id
-            rawFileModel.getListOfRawFileByMetaDataIdList(metadatalist)
-                .then(rawfilelist => {
-
-                    var preparingZipPromise = fileFuncs.prepareDownloadZipFile(submissionIdThatWillBeDownloaded, metadatalist, rawfilelist)
-
-                    preparingZipPromise.then(function (value) {
-                        console.log(value)
-                        res.download(value)
-                    })
-                })
+     // with that meta data list, return raw files that matches metadata id
+    rawFileModel.getListOfRawFileByMetaDataIdList(metaList)
+        .then(rawfilelist => {
+            var preparingZipPromise = fileFuncs.prepareDownloadZipFile(metaList, rawfilelist)
+            preparingZipPromise.then(function (value) {
+                console.log(value)
+                res.download(value)
+            })
         })
 }
 
