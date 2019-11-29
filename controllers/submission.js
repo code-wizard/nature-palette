@@ -40,8 +40,13 @@ module.exports.uploadSubmission = (req, res) => {
         const hm = []
         data = []
 
+        let index = 0;
+        var errorMessage = []
+        var fileNames = []
+        var metaData = []
+
         if (!metadataFile || !rawFile) {
-            errorMessage.push("Attach only .csv or .zip file")
+            errorMessage.push({message: "Attach only .csv or .zip file"})
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
@@ -50,7 +55,7 @@ module.exports.uploadSubmission = (req, res) => {
                 errorMessage: errorMessage
             });
         } else if(["Transmittance", "Irradiance"].includes(submission.typeOfData)){
-            errorMessage.push("We are currenly accepting only Transamittance data")
+            errorMessage.push({message: "We are currenly accepting only Transamittance data"})
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
@@ -60,7 +65,7 @@ module.exports.uploadSubmission = (req, res) => {
             });
         }
         else if (parseInt(submission.embargo) && !submission.releaseDate) {
-            errorMessage.push( "Please specify embargo expiry date")
+            errorMessage.push( {message: "Please specify embargo expiry date"})
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
@@ -69,7 +74,7 @@ module.exports.uploadSubmission = (req, res) => {
                 errorMessage: errorMessage
             });
         } else if (submission.releaseDate && dateFn.getYear(new Date(submission.releaseDate)) < dateFn.getYear(new Date())) {
-            errorMessage.push("Embargo release date must be in the future.")
+            errorMessage.push({message: "Embargo release date must be in the future."})
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
@@ -78,7 +83,7 @@ module.exports.uploadSubmission = (req, res) => {
                 errorMessage: errorMessage
             });
         } else if (submission.releaseDate && dateFn.differenceInYears(new Date(), new Date(submission.releaseDate)) > 1) {
-            errorMessage.push("Embargo release date must not be greater then 1 year from today.")
+            errorMessage.push({message: "Embargo release date must not be greater then 1 year from today."})
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
@@ -87,7 +92,7 @@ module.exports.uploadSubmission = (req, res) => {
                 errorMessage: errorMessage
             });
         } else if (submission.published === "yes" && !submission.doi) {
-            errorMessage.push("Digital Object Reference is required for a published research.")
+            errorMessage.push({message:"Digital Object Reference is required for a published research."})
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
@@ -96,7 +101,7 @@ module.exports.uploadSubmission = (req, res) => {
                 errorMessage: errorMessage
             });
         } else if (submission.published === "yes" && !submission.reference) {
-            errorMessage.push("Reference is required for a published research.")
+            errorMessage.push({message:"Reference is required for a published research."})
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
@@ -125,10 +130,6 @@ module.exports.uploadSubmission = (req, res) => {
             rm.push(f.toLocaleLowerCase())
         }
 
-        let index = 0;
-        var errorMessage = []
-        var fileNames = []
-        var metaData = []
 
         var isColumnsMatch = true
         var isCellValueMissing = true
