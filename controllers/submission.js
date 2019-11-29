@@ -41,61 +41,68 @@ module.exports.uploadSubmission = (req, res) => {
         data = []
 
         if (!metadataFile || !rawFile) {
+            errorMessage.push("Attach only .csv or .zip file")
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
                 req: req,
-                errorMessage: "Attach only .csv or .zip file"
+                errorMessage: errorMessage
             });
         } else if(["Transmittance", "Irradiance"].includes(submission.typeOfData)){
+            errorMessage.push("We are currenly accepting only Transamittance data")
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
                 req: req,
-                errorMessage: "We are currenly accepting only Transamittance data"
+                errorMessage: errorMessage
             });
         }
         else if (parseInt(submission.embargo) && !submission.releaseDate) {
+            errorMessage.push( "Please specify embargo expiry date")
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 req: req,
                 success: false,
-                errorMessage: "Please specify embargo expiry date"
+                errorMessage: errorMessage
             });
         } else if (submission.releaseDate && dateFn.getYear(new Date(submission.releaseDate)) < dateFn.getYear(new Date())) {
+            errorMessage.push("Embargo release date must be in the future.")
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
                 req: req,
-                errorMessage: "Embargo release date must be in the future."
+                errorMessage: errorMessage
             });
         } else if (submission.releaseDate && dateFn.differenceInYears(new Date(), new Date(submission.releaseDate)) > 1) {
+            errorMessage.push("Embargo release date must not be greater then 1 year from today.")
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
                 req: req,
-                errorMessage: "Embargo release date must not be greater then 1 year from today."
+                errorMessage: errorMessage
             });
         } else if (submission.published === "yes" && !submission.doi) {
+            errorMessage.push("Digital Object Reference is required for a published research.")
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 req: req,
                 success: false,
-                errorMessage: "Digital Object Reference is required for a published research."
+                errorMessage: errorMessage
             });
         } else if (submission.published === "yes" && !submission.reference) {
+            errorMessage.push("Reference is required for a published research.")
             return res.status(422).render("submission", {
                 title: "Nature Palette - Upload",
                 hasError: true,
                 success: false,
                 req: req,
-                errorMessage: "Reference is required for a published research."
+                errorMessage: errorMessage
             });
         }
 
